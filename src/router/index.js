@@ -1,11 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { ref, computed , onMounted, onUnmounted } from 'vue'
+import { ref, computed } from 'vue'
 
 // 创建一个全局的响应式屏幕宽度状态
 export const screenWidth = ref(window.innerWidth)
 
 // 使用计算属性来决定是否为移动端视图
 export const isMobileView = computed(() => screenWidth.value <= 600)
+
+// 动态导入组件
+const HomeViewDesktop = () => import('../views/desktop/HomeView.vue')
+const HomeViewMobile = () => import('../views/mobile/HomeView.vue')
+const GalleryViewDesktop = () => import('../views/desktop/GalleryView.vue')
+const GalleryViewMobile = () => import('../views/mobile/GalleryView.vue')
+const FavoritesViewDesktop = () => import('../views/desktop/FavoritesView.vue')
+const FavoritesViewMobile = () => import('../views/mobile/FavoritesView.vue')
 
 // 路由配置
 const routes = [
@@ -15,21 +23,27 @@ const routes = [
   },
   {
     path: '/home',
-    component: () => screenWidth.value > 600 
-      ? import('../views/desktop/HomeView.vue')
-      : import('../views/mobile/HomeView.vue')
+    component: () => import('./views/ResponsiveView.vue'),
+    props: {
+      desktopComponent: HomeViewDesktop,
+      mobileComponent: HomeViewMobile
+    }
   },
   {
     path: '/gallery',
-    component: () => screenWidth.value > 600
-      ? import('../views/desktop/GalleryView.vue')
-      : import('../views/mobile/GalleryView.vue')
+    component: () => import('./views/ResponsiveView.vue'),
+    props: {
+      desktopComponent: GalleryViewDesktop,
+      mobileComponent: GalleryViewMobile
+    }
   },
   {
     path: '/favorites',
-    component: () => screenWidth.value > 600
-      ? import('../views/desktop/FavoritesView.vue')
-      : import('../views/mobile/FavoritesView.vue')
+    component: () => import('./views/ResponsiveView.vue'),
+    props: {
+      desktopComponent: FavoritesViewDesktop,
+      mobileComponent: FavoritesViewMobile
+    }
   }
 ]
 
@@ -43,15 +57,6 @@ router.beforeEach((to, from, next) => {
   // 更新屏幕宽度
   screenWidth.value = window.innerWidth
   next()
-})
-
-// 添加和移除窗口大小变化的监听器
-onMounted(() => {
-  window.addEventListener('resize', handleResize)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
 })
 
 export default router
