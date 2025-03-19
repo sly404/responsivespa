@@ -2,24 +2,43 @@
   <component :is="currentComponent" />
 </template>
 
-<script setup>
-import { computed } from 'vue'
+<script>
 import { defineAsyncComponent } from 'vue'
-import { isMobileView } from '../index'
+import { viewType } from '../index'
 
-const props = defineProps({
-  desktopComponent: {
-    type: Function,
-    required: true
+export default {
+  props: {
+    desktopComponent: {
+      type: Function,
+      required: true
+    },
+    tabletComponent: {
+      type: Function,
+      default: null
+    },
+    mobileComponent: {
+      type: Function,
+      required: true
+    }
   },
-  mobileComponent: {
-    type: Function,
-    required: true
+  data() {
+    return {
+      desktopAsyncComponent: defineAsyncComponent(this.desktopComponent),
+      tabletAsyncComponent: this.tabletComponent ? defineAsyncComponent(this.tabletComponent) : null,
+      mobileAsyncComponent: defineAsyncComponent(this.mobileComponent)
+    }
+  },
+  computed: {
+    currentComponent() {
+      switch (viewType.value) {
+        case 'mobile':
+          return this.mobileAsyncComponent
+        case 'tablet':
+          return this.tabletAsyncComponent || this.desktopAsyncComponent
+        default:
+          return this.desktopAsyncComponent
+      }
+    }
   }
-})
-
-const currentComponent = computed(() => {
-  const component = isMobileView.value ? props.mobileComponent : props.desktopComponent
-  return defineAsyncComponent(component)
-})
+}
 </script>

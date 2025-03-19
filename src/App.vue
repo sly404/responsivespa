@@ -1,27 +1,26 @@
-<script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+<script>
 import { screenWidth } from './router'
 
-const router = useRouter()
-
-const handleResize = () => {
-  screenWidth.value = window.innerWidth
-  // 在屏幕尺寸变化时重新加载路由组件
-  router.replace(router.currentRoute.value.fullPath)
+export default {
+  data() {
+    return {}
+  },
+  methods: {
+    handleResize() {
+      screenWidth.value = window.innerWidth
+    }
+  },
+  mounted() {
+    // 初始化屏幕宽度
+    screenWidth.value = window.innerWidth
+    // 添加窗口大小变化的监听器
+    window.addEventListener('resize', this.handleResize)
+  },
+  beforeDestroy() {
+    // 移除窗口大小变化的监听器
+    window.removeEventListener('resize', this.handleResize)
+  }
 }
-
-onMounted(() => {
-  // 初始化屏幕宽度
-  screenWidth.value = window.innerWidth
-  // 添加窗口大小变化的监听器
-  window.addEventListener('resize', handleResize)
-})
-
-onUnmounted(() => {
-  // 移除窗口大小变化的监听器
-  window.removeEventListener('resize', handleResize)
-})
 </script>
 
 <template>
