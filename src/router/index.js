@@ -21,15 +21,15 @@ export const viewType = computed(() => {
 })
 
 // 动态导入组件
-const HomeViewDesktop = () => import('../views/desktop/HomeView.vue')
-const HomeViewTablet = () => import('../views/tablet/HomeView.vue')
-const HomeViewMobile = () => import('../views/mobile/HomeView.vue')
-const GalleryViewDesktop = () => import('../views/desktop/GalleryView.vue')
-const GalleryViewTablet = () => import('../views/tablet/GalleryView.vue')
-const GalleryViewMobile = () => import('../views/mobile/GalleryView.vue')
-const FavoritesViewDesktop = () => import('../views/desktop/FavoritesView.vue')
-const FavoritesViewTablet = () => import('../views/tablet/FavoritesView.vue')
-const FavoritesViewMobile = () => import('../views/mobile/FavoritesView.vue')
+const HomeViewDesktop = () => import('../views/HomeView.vue')
+const HomeViewTablet = () => import('../views/HomeView.vue')
+const HomeViewMobile = () => import('../views/HomeView.vue')
+const GalleryViewDesktop = () => import('../views/GalleryView.vue')
+const GalleryViewTablet = () => import('../views/GalleryView.vue')
+const GalleryViewMobile = () => import('../views/GalleryView.vue')
+const FavoritesViewDesktop = () => import('../views/FavoritesView.vue')
+const FavoritesViewTablet = () => import('../views/FavoritesView.vue')
+const FavoritesViewMobile = () => import('../views/FavoritesView.vue')
 
 // 路由配置
 const routes = [
