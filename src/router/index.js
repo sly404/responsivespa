@@ -20,17 +20,6 @@ export const viewType = computed(() => {
   return 'desktop'
 })
 
-// 动态导入组件
-const HomeViewDesktop = () => import('../views/HomeView.vue')
-const HomeViewTablet = () => import('../views/HomeView.vue')
-const HomeViewMobile = () => import('../views/HomeView.vue')
-const GalleryViewDesktop = () => import('../views/GalleryView.vue')
-const GalleryViewTablet = () => import('../views/GalleryView.vue')
-const GalleryViewMobile = () => import('../views/GalleryView.vue')
-const FavoritesViewDesktop = () => import('../views/FavoritesView.vue')
-const FavoritesViewTablet = () => import('../views/FavoritesView.vue')
-const FavoritesViewMobile = () => import('../views/FavoritesView.vue')
-
 // 路由配置
 const routes = [
   {
@@ -39,30 +28,265 @@ const routes = [
   },
   {
     path: '/home',
-    component: () => import('./views/ResponsiveView.vue'),
-    props: {
-      desktopComponent: HomeViewDesktop,
-      tabletComponent: HomeViewTablet,
-      mobileComponent: HomeViewMobile
-    }
+    name: 'home',
+    component: () => import('../views/HomeView.vue'),
+    children: [
+      {
+        path: '',
+        name: 'home-default',
+        component: () => import('../components/ContentView.vue'),
+        props: {
+          title: '个人中心',
+          items: []
+        }
+      }
+    ]
   },
+  // 消息相关路由
   {
-    path: '/gallery',
-    component: () => import('./views/ResponsiveView.vue'),
-    props: {
-      desktopComponent: GalleryViewDesktop,
-      tabletComponent: GalleryViewTablet,
-      mobileComponent: GalleryViewMobile
-    }
+    path: '/messages',
+    name: 'messages',
+    component: () => import('../views/HomeView.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('../components/ContentView.vue'),
+        props: {
+          title: '我的消息'
+        }
+      }
+    ]
   },
+  // 订阅相关路由
+  {
+    path: '/subscriptions',
+    name: 'subscriptions',
+    component: () => import('../views/HomeView.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('../components/ContentView.vue'),
+        props: {
+          title: '我的订阅'
+        }
+      }
+    ]
+  },
+  // 已赞相关路由
+  {
+    path: '/likes',
+    name: 'likes',
+    component: () => import('../views/HomeView.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('../components/ContentView.vue'),
+        props: {
+          title: '我的点赞'
+        }
+      }
+    ]
+  },
+  // 收藏相关路由
   {
     path: '/favorites',
-    component: () => import('./views/ResponsiveView.vue'),
-    props: {
-      desktopComponent: FavoritesViewDesktop,
-      tabletComponent: FavoritesViewTablet,
-      mobileComponent: FavoritesViewMobile
-    }
+    name: 'favorites',
+    component: () => import('../views/HomeView.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('../components/ContentView.vue'),
+        props: {
+          title: '我的收藏'
+        }
+      }
+    ]
+  },
+  // 历史相关路由
+  {
+    path: '/history',
+    name: 'history',
+    component: () => import('../views/HomeView.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('../components/ContentView.vue'),
+        props: {
+          title: '浏览历史'
+        }
+      }
+    ]
+  },
+  // 内容管理相关路由
+  {
+    path: '/comments',
+    name: 'comments',
+    component: () => import('../views/HomeView.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('../components/ContentView.vue'),
+        props: {
+          title: '评论管理'
+        }
+      }
+    ]
+  },
+  {
+    path: '/articles',
+    name: 'articles',
+    component: () => import('../views/HomeView.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('../components/ContentView.vue'),
+        props: {
+          title: '文章管理'
+        }
+      }
+    ]
+  },
+  {
+    path: '/activities',
+    name: 'activities',
+    component: () => import('../views/HomeView.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('../components/ContentView.vue'),
+        props: {
+          title: '动态管理'
+        }
+      }
+    ]
+  },
+  {
+    path: '/videos',
+    name: 'videos',
+    component: () => import('../views/HomeView.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('../components/ContentView.vue'),
+        props: {
+          title: '视频管理'
+        }
+      }
+    ]
+  },
+  // 更多服务相关路由
+  {
+    path: '/questions',
+    name: 'questions',
+    component: () => import('../views/HomeView.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('../components/ContentView.vue'),
+        props: {
+          title: '提问号'
+        }
+      }
+    ]
+  },
+  {
+    path: '/coins',
+    name: 'coins',
+    component: () => import('../views/HomeView.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('../components/ContentView.vue'),
+        props: {
+          title: '搜狐金币'
+        }
+      }
+    ]
+  },
+  {
+    path: '/feedback',
+    name: 'feedback',
+    component: () => import('../views/HomeView.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('../components/ContentView.vue'),
+        props: {
+          title: '意见反馈'
+        }
+      }
+    ]
+  },
+  {
+    path: '/settings',
+    name: 'settings',
+    component: () => import('../views/HomeView.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('../components/ContentView.vue'),
+        props: {
+          title: '设置'
+        }
+      }
+    ]
+  },
+  // 顶部导航相关路由
+  {
+    path: '/news',
+    name: 'news',
+    component: () => import('../views/HomeView.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('../components/ContentView.vue'),
+        props: {
+          title: '新闻'
+        }
+      }
+    ]
+  },
+  {
+    path: '/sports',
+    name: 'sports',
+    component: () => import('../views/HomeView.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('../components/ContentView.vue'),
+        props: {
+          title: '体育'
+        }
+      }
+    ]
+  },
+  {
+    path: '/auto',
+    name: 'auto',
+    component: () => import('../views/HomeView.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('../components/ContentView.vue'),
+        props: {
+          title: '汽车'
+        }
+      }
+    ]
+  },
+  {
+    path: '/estate',
+    name: 'estate',
+    component: () => import('../views/HomeView.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('../components/ContentView.vue'),
+        props: {
+          title: '房产'
+        }
+      }
+    ]
   }
 ]
 

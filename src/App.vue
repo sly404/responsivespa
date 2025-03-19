@@ -1,3 +1,7 @@
+<template>
+  <router-view></router-view>
+</template>
+
 <script>
 import { screenWidth } from './router'
 
@@ -23,14 +27,21 @@ export default {
 }
 </script>
 
-<template>
-  <router-view></router-view>
-</template>
-
 <style>
 /* 全局样式 */
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  padding: 0;
+  font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
 }
 </style>
