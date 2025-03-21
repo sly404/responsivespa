@@ -37,7 +37,7 @@ export default {
   props: {
     title: {
       type: String,
-      default: '已发布的文章'
+      default: ''
     },
     items: {
       type: Array,
