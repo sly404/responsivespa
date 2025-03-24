@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { screenWidth } from './router'
+import { screenWidth } from './composables/useResponsive'
 
 export default {
   data() {

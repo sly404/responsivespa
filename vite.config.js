@@ -5,11 +5,18 @@ import vue from '@vitejs/plugin-vue2'
 export default defineConfig({
   plugins: [vue()],
   server: {
-    port: 3000,
+    port: 3001,
     host: true,
     strictPort: true,
     hmr: {
       overlay: true
+    }
+  },
+  css: {
+    preprocessorOptions: {
+      less: {
+        javascriptEnabled: true // 支持Less中的JavaScript表达式
+      }
     }
   }
 })

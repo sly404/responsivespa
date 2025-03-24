@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import { getEnvironmentByURL } from 'mpfe-utils';
 export default {
     name: "TopHeader",
     props: {
@@ -23,7 +24,32 @@ export default {
     },
     methods: {
         goBack() {
-            this.$emit("go-back")
+            // 获取当前路由信息
+            const currentRoute = this.$router.currentRoute;
+            // 判断是否在根路径
+            if (currentRoute.path === '/' || currentRoute.fullPath === '/') {
+                if (
+                    document.referrer &&
+                    document.referrer.indexOf("m.sohu.com/login") == -1 &&
+                    document.referrer.indexOf("mp.sohu.com/") == -1 &&
+                    document.referrer.indexOf("read.m.sohu.com/") == -1 &&
+                    document.referrer.indexOf("book.m.sohu.com/") == -1
+                ) {
+                    // 如果有referrer且referrer不是登录页、小说页、搜狐号
+                    window.history.back();
+                } else { // 否则就返回手搜主页
+                    const urlMap = {
+                        test: "//test-m.sohu.com",
+                        pre: "//pre-m.sohu.com",
+                        prod: "//m.sohu.com"
+                    };
+                    const env = getEnvironmentByURL()
+                    window.location.href = urlMap[env] || urlMap.prod;
+                }
+            } else {
+                // 否则正常返回上一页
+                this.$router.go(-1);
+            }
         },
     },
 }

@@ -5,12 +5,11 @@
                 v-if="!isMobile || isContentActive"
                 class="content-container"
                 :class="{ 'mobile-active': isMobile && isContentActive }"
-                :key="'content-container'"
+                key="content-container"
             >
                 <TopHeader
                     v-if="showTopHeader"
                     :title="routeTitle"
-                    @go-back="backToNavigation"
                 />
                 <div class="router-view-wrapper">
                     <router-view v-slot="{ Component }">
@@ -137,10 +136,6 @@ export default {
                 }
             }
             return minLength - 1
-        },
-
-        backToNavigation() {
-            this.$emit("back-to-navigation")
         },
     },
 }

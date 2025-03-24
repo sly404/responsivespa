@@ -10,31 +10,31 @@ export const mockNavItems = [
             {
                 "title": "消息",
                 "url": "/messages?scm=10001.403_14-201000.0.0.0",
-                "cover": [],
+                "cover": ['https://www.helloimg.com/i/2025/03/21/67dd4ee24a529.png'],
                 "id": 38279
             },
             {
                 "title": "订阅",
-                "url": "/subscriptions?scm=10001.403_14-201000.0.0.0",
-                "cover": [],
+                "url": "/follow?scm=10001.403_14-201000.0.0.0",
+                "cover": ['https://www.helloimg.com/i/2025/03/21/67dd4eac8ad1c.png'],
                 "id": 38280
             },
             {
                 "title": "已赞",
-                "url": "/likes?scm=10001.403_14-201000.0.0.0",
-                "cover": [],
+                "url": "/likeArticle?scm=10001.403_14-201000.0.0.0",
+                "cover": ['https://www.helloimg.com/i/2025/03/21/67dd4eace1367.png'],
                 "id": 38281
             },
             {
                 "title": "收藏",
                 "url": "/favorites?scm=10001.403_14-201000.0.0.0",
-                "cover": [],
+                "cover": ['https://www.helloimg.com/i/2025/03/21/67dd4eb07d4ad.png'],
                 "id": 38282
             },
             {
                 "title": "历史",
                 "url": "/history?scm=10001.403_14-201000.0.0.0",
-                "cover": [],
+                "cover": ['https://www.helloimg.com/i/2025/03/21/67dd4eb38cf1c.png'],
                 "id": 38283
             },
         ]
@@ -50,19 +50,19 @@ export const mockNavItems = [
             {
                 "title": "评论",
                 "url": "/comments?scm=10001.403_14-201000.0.0.0",
-                "cover": [],
+                "cover": ["https://img.picui.cn/free/2025/03/24/67e11494442b9.png"],
                 "id": 38288
             },
             {
                 "title": "动态/讨论",
                 "url": "/activities?scm=10001.403_14-201000.0.0.0",
-                "cover": [],
+                "cover": ["https://img.picui.cn/free/2025/03/24/67e1149443d77.png"],
                 "id": 38289
             },
             {
                 "title": "视野",
                 "url": "/vision?scm=10001.403_14-201000.0.0.0",
-                "cover": [],
+                "cover": ["https://img.picui.cn/free/2025/03/24/67e1149431bf5.png"],
                 "id": 38290
             },
         ]
@@ -77,7 +77,7 @@ export const mockNavItems = [
         "innerNews": [
             {
                 "title": "搜狐号",
-                "url": "https://mp.sohu.com/h5/v2/accounts/select",
+                "url": "//mp.sohu.com/h5/v2/accounts/select",
                 "cover": [],
                 "id": 38300
             },
@@ -89,7 +89,7 @@ export const mockNavItems = [
             },
             {
                 "title": "意见反馈",
-                "url": "/myFeedback",
+                "url": "/feedback",
                 "cover": [],
                 "id": 38302
             },
@@ -102,8 +102,8 @@ export const mockNavItems = [
             },
             {
                 "title": "设置",
-                "url": "/setting",
-                "routeName": "setting",
+                "url": "/settings",
+                "routeName": "settings",
                 "cover": [],
                 "id": 38304
             },

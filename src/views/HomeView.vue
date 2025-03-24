@@ -5,7 +5,7 @@
         <!-- 导航组件 -->
         <AppNavigation :isContentActive="isContentActive" @content-active="onContentActive" />
         <!-- 路由视图容器 -->
-        <RouterViewContainer :isContentActive="isContentActive" @back-to-navigation="backToNavigation" />
+        <RouterViewContainer :isContentActive="isContentActive"/>
     </div>
 </template>
 
@@ -59,11 +59,6 @@ export default {
         // 从移动导航激活内容区域
         onContentActive(active) {
             this.isContentActive = active;
-        },
-
-        // 返回到导航
-        backToNavigation() {
-            this.isContentActive = false;
         },
     },
 };

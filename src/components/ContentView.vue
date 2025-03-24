@@ -7,22 +7,6 @@
       
       <div class="content-list">
         <slot>
-          <!-- 默认内容，若子组件未提供内容时显示 -->
-          <div v-for="(item, index) in items" :key="index" class="content-item">
-            <div v-if="item.thumbnail" class="content-thumbnail">
-              <img :src="item.thumbnail" :alt="item.title" />
-            </div>
-            <div class="content-details">
-              <h3 class="content-title">{{ item.title }}</h3>
-              <div class="content-meta">
-                <span class="meta-date">{{ item.date }}</span>
-                <span class="meta-likes">
-                  <i class="icon-like"></i>
-                  <span>{{ item.likes }}</span>
-                </span>
-              </div>
-            </div>
-          </div>
         </slot>
       </div>
     </div>
