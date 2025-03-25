@@ -1,28 +1,5 @@
 <template>
   <div class="desktop-navigation">
-    <!-- 桌面端顶部导航，仅在宽屏(>840px)下显示 -->
-    <div class="desktop-nav" v-if="isDesktop">
-      <div class="nav-left">
-        <div class="logo">
-          <img :src="placeholderLogo" alt="搜狐LOGO" />
-        </div>
-        <nav class="main-nav">
-          <a 
-            v-for="(item, index) in topNavItems" 
-            :key="index"
-            :class="['nav-item', { active: activeTopNav === index }]"
-            @click="navigateTop(item.route, index)">
-            {{ item.title }}
-          </a>
-        </nav>
-      </div>
-      <div class="nav-right">
-        <div class="user-mini">
-          <img :src="placeholderAvatar" alt="用户头像" />
-        </div>
-      </div>
-    </div>
-
     <!-- 左侧边栏导航 -->
     <div class="sidebar">
       <div class="sidebar-section" v-for="(section, sectionIndex) in sidebarSections" :key="sectionIndex">
@@ -44,17 +21,11 @@
 </template>
 
 <script>
-import { BREAKPOINTS } from '../router';
-import { placeholderAvatar, placeholderLogo } from '../assets/placeholder'
+import { isDesktop } from '../../composables/useResponsive'
+import { placeholderAvatar, placeholderLogo } from '../../assets/placeholder'
 
 export default {
   name: 'DesktopNavigation',
-  props: {
-    screenWidth: {
-      type: Number,
-      required: true
-    }
-  },
   data() {
     return {
       placeholderAvatar,
@@ -106,7 +77,7 @@ export default {
   },
   computed: {
     isDesktop() {
-      return this.screenWidth >= BREAKPOINTS.TABLET;
+      return isDesktop.value;
     }
   },
   created() {

@@ -1,6 +1,6 @@
 <template>
     <div class="home-view" :class="{ mobile: isMobile, tablet: isTablet, desktop: isDesktop }">
-        <TopHeader />
+        <Header />
         <UserInfo />
         <!-- 导航组件 -->
         <AppNavigation :isContentActive="isContentActive" @content-active="onContentActive" />
@@ -16,16 +16,16 @@ import {
     isDesktop,
     setupResizeListener,
 } from "../composables/useResponsive";
-import AppNavigation from "../components/AppNavigation.vue";
-import RouterViewContainer from "../components/RouterViewContainer.vue";
-import TopHeader from "../components/TopHeader.vue";
+import AppNavigation from "../components/Navigation/index.vue";
+import RouterViewContainer from "../components/Content/Index.vue";
+import Header from "../components/Header/Index.vue";
 import UserInfo from "../components/UserInfo.vue";
 export default {
     name: "HomeView",
     components: {
         AppNavigation,
         RouterViewContainer,
-        TopHeader,
+        Header,
         UserInfo,
     },
     data() {
@@ -80,17 +80,7 @@ export default {
 }
 
 /* 移动端样式 (小于 600px) */
-.home-view.mobile {
+.home-view {
     flex-direction: column;
-}
-
-/* 平板端样式 (600px - 840px) */
-.home-view.tablet {
-    flex-direction: row;
-}
-
-/* 桌面端样式 (大于 840px) */
-.home-view.desktop {
-    flex-direction: row;
 }
 </style>

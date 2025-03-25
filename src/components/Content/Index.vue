@@ -7,10 +7,6 @@
                 :class="{ 'mobile-active': isMobile && isContentActive }"
                 key="content-container"
             >
-                <TopHeader
-                    v-if="showTopHeader"
-                    :title="routeTitle"
-                />
                 <div class="router-view-wrapper">
                     <router-view v-slot="{ Component }">
                         <transition :name="transitionName">
@@ -28,14 +24,10 @@
 </template>
 
 <script>
-import { isMobile, isTablet, isDesktop } from "../composables/useResponsive"
-import TopHeader from "./TopHeader.vue"
+import { isMobile, isTablet, isDesktop } from "../../composables/useResponsive"
 
 export default {
     name: "RouterViewContainer",
-    components: {
-        TopHeader,
-    },
     props: {
         isContentActive: {
             type: Boolean,
@@ -58,15 +50,6 @@ export default {
         isDesktop() {
             return isDesktop.value
         },
-        showTopHeader() {
-            return (this.isMobile || this.isTablet) && this.isContentActive
-        },
-        routeTitle() {
-            console.log('路由信息:', this.$route);
-            return (this.$route.meta && this.$route.meta.title) || 
-                    (this.$route.matched && this.$route.matched[0] && this.$route.matched[0].meta.title) || 
-                    '个人中心';
-        }
     },
     mounted() {
         // 监听路由变化

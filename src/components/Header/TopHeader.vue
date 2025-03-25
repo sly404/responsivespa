@@ -12,15 +12,12 @@
 import { getEnvironmentByURL } from 'mpfe-utils';
 export default {
     name: "TopHeader",
-    props: {
-        title: {
-            type: String,
-            default: "个人中心",
-        },
-        icon: {
-            type: String,
-            default: "menu",
-        },
+    computed: {
+        title(){
+            return (this.$route.meta && this.$route.meta.title) || 
+                    (this.$route.matched && this.$route.matched[0] && this.$route.matched[0].meta.title) || 
+                    '个人中心';
+        }
     },
     methods: {
         goBack() {

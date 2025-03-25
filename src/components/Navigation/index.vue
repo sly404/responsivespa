@@ -16,7 +16,7 @@ import {
     isMobile,
     isTablet,
     isDesktop,
-} from "../composables/useResponsive"
+} from "../../composables/useResponsive"
 
 // 动态按需导入导航组件 - 使用Vue 2的方式
 const MobileNavigation = () => import("./MobileNavigation.vue")

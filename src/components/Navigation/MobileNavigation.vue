@@ -5,7 +5,7 @@
                 v-for="(item, index) in firstNavList"
                 :key="index"
                 class="nav-item"
-                @click="navigateTo(item.url, index)"
+                @click="navigateTo(item, index)"
             >
                 <div class="icon-nav" :style="getIconStyle(item)"></div>
                 <span>{{ item.title }}</span>
@@ -21,7 +21,7 @@
                     v-for="(item, index) in secondNavList" 
                     :key="index" 
                     class="content-navigation-item"
-                    @click="navigateTo(item.url, index)">
+                    @click="navigateTo(item, index)">
                     <div class="content-icon-nav" :style="getIconStyle(item)"></div>
                     <span>{{ item.title }}</span>
                 </div>
@@ -40,7 +40,7 @@
                     v-for="(item, childIndex) in otherNavItem.innerNews" 
                     :key="'otherNavList'+childIndex" 
                     class="list-navigation-item"
-                    @click="navigateTo(item.url, index)">
+                    @click="navigateTo(item, index)">
                     <span>{{ item.title }}</span>
                     <span class="icon-arrow-right"></span>
                 </div>
@@ -51,7 +51,7 @@
 
 <script>
 import { setPicSize } from 'mpfe-utils'
-import { mockNavItems } from '../requests/mockData'
+import { mockNavItems } from '../../requests/mockData'
 export default {
     name: "MobileNavigation",
     data() {
@@ -85,14 +85,15 @@ export default {
     },
     methods: {
         navigateTo(route, index) {
+            const { routeName, url } = route
             this.activeIndex = index
-            if(/^(https?:)?\/\//.test(route)){
-                window.location.href = route
+            if(/^(https?:)?\/\//.test(url)){
+                window.location.href = url
                 return
             }
             // 检查当前路由是否已经是目标路由
-            if (this.$route.path !== route) {
-                this.$router.push(route)
+            if (this.$route.path != url) {
+                this.$router.push(url)
             }
             // 触发导航事件，通知父组件
             this.$emit("navigate")

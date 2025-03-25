@@ -9,33 +9,38 @@ export const mockNavItems = [
         "innerNews": [
             {
                 "title": "消息",
-                "url": "/messages?scm=10001.403_14-201000.0.0.0",
+                "url": "/ucenter/messages?scm=10001.403_14-201000.0.0.0",
                 "cover": ['https://www.helloimg.com/i/2025/03/21/67dd4ee24a529.png'],
-                "id": 38279
+                "id": 38279,
+                "routeName": "messages"
             },
             {
                 "title": "订阅",
-                "url": "/follow?scm=10001.403_14-201000.0.0.0",
+                "url": "/ucenter/follow?scm=10001.403_14-201000.0.0.0",
                 "cover": ['https://www.helloimg.com/i/2025/03/21/67dd4eac8ad1c.png'],
-                "id": 38280
+                "id": 38280,
+                "routeName": "follow"
             },
             {
                 "title": "已赞",
-                "url": "/likeArticle?scm=10001.403_14-201000.0.0.0",
+                "url": "/ucenter/likeArticle?scm=10001.403_14-201000.0.0.0",
                 "cover": ['https://www.helloimg.com/i/2025/03/21/67dd4eace1367.png'],
-                "id": 38281
+                "id": 38281,
+                "routeName": "likeArticle"
             },
             {
                 "title": "收藏",
-                "url": "/favorites?scm=10001.403_14-201000.0.0.0",
+                "url": "/ucenter/favorites?scm=10001.403_14-201000.0.0.0",
                 "cover": ['https://www.helloimg.com/i/2025/03/21/67dd4eb07d4ad.png'],
-                "id": 38282
+                "id": 38282,
+                "routeName": "favorites"
             },
             {
                 "title": "历史",
-                "url": "/history?scm=10001.403_14-201000.0.0.0",
+                "url": "/ucenter/history?scm=10001.403_14-201000.0.0.0",
                 "cover": ['https://www.helloimg.com/i/2025/03/21/67dd4eb38cf1c.png'],
-                "id": 38283
+                "id": 38283,
+                "routeName": "history"
             },
         ]
     },
@@ -49,21 +54,24 @@ export const mockNavItems = [
         "innerNews": [
             {
                 "title": "评论",
-                "url": "/comments?scm=10001.403_14-201000.0.0.0",
+                "url": "/ucenter/comments?scm=10001.403_14-201000.0.0.0",
                 "cover": ["https://img.picui.cn/free/2025/03/24/67e11494442b9.png"],
-                "id": 38288
+                "id": 38288,
+                "routeName": "comments"
             },
             {
                 "title": "动态/讨论",
-                "url": "/activities?scm=10001.403_14-201000.0.0.0",
+                "url": "/ucenter/activities?scm=10001.403_14-201000.0.0.0",
                 "cover": ["https://img.picui.cn/free/2025/03/24/67e1149443d77.png"],
-                "id": 38289
+                "id": 38289,
+                "routeName": "activities"
             },
             {
                 "title": "视野",
-                "url": "/vision?scm=10001.403_14-201000.0.0.0",
+                "url": "/ucenter/vision?scm=10001.403_14-201000.0.0.0",
                 "cover": ["https://img.picui.cn/free/2025/03/24/67e1149431bf5.png"],
-                "id": 38290
+                "id": 38290,
+                "routeName": "vision"
             },
         ]
     },
@@ -79,7 +87,7 @@ export const mockNavItems = [
                 "title": "搜狐号",
                 "url": "//mp.sohu.com/h5/v2/accounts/select",
                 "cover": [],
-                "id": 38300
+                "id": 38300,
             },
             {
                 "title": "搜狐金彩",
@@ -89,9 +97,10 @@ export const mockNavItems = [
             },
             {
                 "title": "意见反馈",
-                "url": "/feedback",
+                "url": "/ucenter/feedback?scm=10001.403_14-201000.0.0.0",
                 "cover": [],
-                "id": 38302
+                "id": 38302,
+                "routeName": "feedback"
             },
             {
                 "title": "安全中心",
@@ -102,7 +111,7 @@ export const mockNavItems = [
             },
             {
                 "title": "设置",
-                "url": "/settings",
+                "url": "/ucenter/settings?scm=10001.403_14-201000.0.0.0",
                 "routeName": "settings",
                 "cover": [],
                 "id": 38304
