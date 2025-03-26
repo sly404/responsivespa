@@ -1,6 +1,7 @@
 import Vue from "vue"
 import VueRouter from "vue-router"
 import HomeView from "../views/HomeView.vue"
+import ContentView from "../components/Content/Index.vue"
 
 Vue.use(VueRouter)
 
@@ -19,7 +20,7 @@ const routes = [
                 props: {
                     title: "我的消息",
                 },
-                component: () => import("../components/ContentView.vue")
+                component: ContentView
             },
             {
                 path: "follow",
@@ -27,7 +28,7 @@ const routes = [
                 meta: {
                     title: "我的订阅",
                 },
-                component: () => import("../components/ContentView.vue")
+                component: ContentView
             },
             {
                 path: "/likeArticle",
@@ -35,7 +36,7 @@ const routes = [
                 meta: {
                     title: "我的已赞",
                 },
-                component: () => import("../components/ContentView.vue")
+                component: ContentView
             },
             {
                 path: "favorites",
@@ -43,7 +44,7 @@ const routes = [
                 meta: {
                     title: "我的收藏",
                 },
-                component: () => import("../components/ContentView.vue")
+                component: ContentView
             },
             {
                 path: "history",
@@ -51,7 +52,7 @@ const routes = [
                 meta: {
                     title: "浏览历史",
                 },
-                component: () => import("../components/ContentView.vue")
+                component: ContentView
             },
             {
                 path: "comments",
@@ -59,7 +60,7 @@ const routes = [
                 meta: {
                     title: "评论管理",
                 },
-                component: () => import("../components/ContentView.vue")
+                component: ContentView
             },
             {
                 path: "activities",
@@ -67,7 +68,7 @@ const routes = [
                 meta: {
                     title: "动态/讨论",
                 },
-                component: () => import("../components/ContentView.vue")
+                component: ContentView
             },
             {
                 path: "vision",
@@ -75,7 +76,7 @@ const routes = [
                 meta: { 
                     title: "视野",
                 },
-                component: () => import("../components/ContentView.vue")
+                component: ContentView
             },
             {
                 path: "feedback",
@@ -83,7 +84,7 @@ const routes = [
                 meta: {
                     title: "意见反馈",
                 },
-                component: () => import("../components/ContentView.vue")
+                component: ContentView
             },
             {
                 path: "settings",
@@ -91,7 +92,7 @@ const routes = [
                 meta: {
                     title: "设置",
                 },
-                component: () => import("../components/ContentView.vue")
+                component: ContentView
             },
         ]
     },

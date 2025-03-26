@@ -3,9 +3,9 @@
         <Header />
         <UserInfo />
         <!-- 导航组件 -->
-        <AppNavigation :isContentActive="isContentActive" @content-active="onContentActive" />
+        <Navigation />
         <!-- 路由视图容器 -->
-        <RouterViewContainer :isContentActive="isContentActive"/>
+        <Content />
     </div>
 </template>
 
@@ -16,21 +16,20 @@ import {
     isDesktop,
     setupResizeListener,
 } from "../composables/useResponsive";
-import AppNavigation from "../components/Navigation/index.vue";
-import RouterViewContainer from "../components/Content/Index.vue";
+import Navigation from "../components/Navigation/index.vue";
+import Content from "../components/Content/Index.vue";
 import Header from "../components/Header/Index.vue";
 import UserInfo from "../components/UserInfo.vue";
 export default {
     name: "HomeView",
     components: {
-        AppNavigation,
-        RouterViewContainer,
+        Navigation,
+        Content,
         Header,
         UserInfo,
     },
     data() {
         return {
-            isContentActive: false,
             cleanupListener: null,
         };
     },
@@ -56,10 +55,6 @@ export default {
         }
     },
     methods: {
-        // 从移动导航激活内容区域
-        onContentActive(active) {
-            this.isContentActive = active;
-        },
     },
 };
 </script>

@@ -7,6 +7,7 @@
                 :class="{ 'mobile-active': isMobile && isContentActive }"
                 key="content-container"
             >
+                <TopHeader />
                 <div class="router-view-wrapper">
                     <router-view v-slot="{ Component }">
                         <transition :name="transitionName">
@@ -24,15 +25,14 @@
 </template>
 
 <script>
-import { isMobile, isTablet, isDesktop } from "../../composables/useResponsive"
+import { isMobile } from "../../composables/useResponsive"
+import { mapGetters } from 'vuex'
+import TopHeader from "../Header/TopHeader.vue"
 
 export default {
     name: "RouterViewContainer",
-    props: {
-        isContentActive: {
-            type: Boolean,
-            required: true,
-        },
+    components: {
+        TopHeader,
     },
     data() {
         return {
@@ -41,14 +41,9 @@ export default {
         }
     },
     computed: {
+        ...mapGetters(['isContentActive']),
         isMobile() {
             return isMobile.value
-        },
-        isTablet() {
-            return isTablet.value
-        },
-        isDesktop() {
-            return isDesktop.value
         },
     },
     mounted() {
