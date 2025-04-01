@@ -1,32 +1,28 @@
 <template>
-    <TopNav v-if="isDesktop"></TopNav>
-    <TopHeader v-else :title="title"></TopHeader>
+    <DesktopHeader v-if="isDesktop"></DesktopHeader>
+    <MobileHeader v-else :title="title"></MobileHeader>
 </template>
 
 <script>
-import { isDesktop } from "../../composables/useResponsive"
-const TopHeader = () => import("./TopHeader.vue")
-const TopNav = () => import("./TopNav.vue")
+import { mapGetters } from 'vuex'
+const MobileHeader = () => import('./MobileHeader.vue')
+const DesktopHeader = () => import('./DesktopHeader.vue')
 export default {
-    name: "Header",
+    name: 'TopHeader',
     props: {
         title: {
             type: String,
-            default: "",
+            default: '',
         },
     },
     components: {
-        TopHeader,
-        TopNav,
+        MobileHeader,
+        DesktopHeader,
     },
     computed: {
-        isDesktop() {
-            return isDesktop.value
-        },
+        ...mapGetters(['isDesktop']),
     },
 }
 </script>
 
-<style>
-
-</style>
+<style></style>

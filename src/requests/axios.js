@@ -1,5 +1,8 @@
 import axios from 'axios'
+import { uisHost } from '@/config/urlConfig'
+import { getEnvironmentByURL } from 'mpfe-utils'
 
+const environment = getEnvironmentByURL(window.location.href)
 export const createAxiosByInterceptors = (config) => {
     const instance = axios.create({
         timeout: 2000,
@@ -35,3 +38,7 @@ export const createAxiosByInterceptors = (config) => {
     )
     return instance
 }
+
+export const ucenterApi = createAxiosByInterceptors({
+    baseURL: uisHost[environment] || uisHost.prod,
+})

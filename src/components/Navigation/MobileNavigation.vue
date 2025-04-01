@@ -1,129 +1,114 @@
 <template>
     <div class="mobile-navigation">
         <div class="interact-navigation">
-            <div
-                v-for="(item, index) in firstNavList"
-                :key="index"
-                class="nav-item"
-                @click="navigateTo(item, index)"
-            >
-                <div class="icon-nav" :style="getIconStyle(item)"></div>
-                <span>{{ item.title }}</span>
-            </div>
+            <template v-for="(item, index) in firstNavList">
+                <router-link
+                    v-if="!isExternalLink(item.url)"
+                    :to="item.url"
+                    class="nav-item"
+                    :key="'first-internal-' + index"
+                >
+                    <div class="icon-nav" :style="getIconStyle(item)"></div>
+                    <span>{{ item.title }}</span>
+                </router-link>
+                <a v-else :href="item.url" class="nav-item" :key="'first-external-' + index">
+                    <div class="icon-nav" :style="getIconStyle(item)"></div>
+                    <span>{{ item.title }}</span>
+                </a>
+            </template>
         </div>
         <div class="content-navigation">
-            <div 
-                v-if="secondNavItem && secondNavItem.title" 
-                class="nav-header">{{ secondNavItem.title }}
+            <div v-if="secondNavItem && secondNavItem.title" class="nav-header">
+                {{ secondNavItem.title }}
             </div>
             <div class="item-wrapper">
-                <div 
-                    v-for="(item, index) in secondNavList" 
-                    :key="index" 
-                    class="content-navigation-item"
-                    @click="navigateTo(item, index)">
-                    <div class="content-icon-nav" :style="getIconStyle(item)"></div>
-                    <span>{{ item.title }}</span>
-                </div>
-            </div>  
-        </div>
-        <div 
-            v-for="(otherNavItem, index) in otherNavList" 
-            :key="'otherNav'+index" 
-            class="list-navigation">
-            <div 
-                v-if="otherNavItem && otherNavItem.title" 
-                class="nav-header">{{ otherNavItem.title }}
+                <template v-for="(item, index) in secondNavList">
+                    <router-link
+                        v-if="!isExternalLink(item.url)"
+                        :to="item.url"
+                        class="content-navigation-item"
+                        :key="'second-internal-' + index"
+                    >
+                        <div class="content-icon-nav" :style="getIconStyle(item)"></div>
+                        <span>{{ item.title }}</span>
+                    </router-link>
+                    <a
+                        v-else
+                        :href="item.url"
+                        class="content-navigation-item"
+                        :key="'second-external-' + index"
+                    >
+                        <div class="content-icon-nav" :style="getIconStyle(item)"></div>
+                        <span>{{ item.title }}</span>
+                    </a>
+                </template>
             </div>
-            <template v-if="otherNavItem && otherNavItem.innerNews && otherNavItem.innerNews.length > 0">
-                <div 
-                    v-for="(item, childIndex) in otherNavItem.innerNews" 
-                    :key="'otherNavList'+childIndex" 
-                    class="list-navigation-item"
-                    @click="navigateTo(item, index)">
-                    <span>{{ item.title }}</span>
-                    <span class="icon-arrow-right"></span>
-                </div>
+        </div>
+        <div
+            v-for="(otherNavItem, navIndex) in otherNavList"
+            :key="'otherNav' + navIndex"
+            class="list-navigation"
+        >
+            <div v-if="otherNavItem && otherNavItem.title" class="nav-header">
+                {{ otherNavItem.title }}
+            </div>
+            <template
+                v-if="otherNavItem && otherNavItem.innerNews && otherNavItem.innerNews.length > 0"
+            >
+                <template v-for="(item, childIndex) in otherNavItem.innerNews">
+                    <router-link
+                        v-if="!isExternalLink(item.url)"
+                        :to="item.url"
+                        class="list-navigation-item"
+                        :key="'other-internal-' + navIndex + '-' + childIndex"
+                    >
+                        <span>{{ item.title }}</span>
+                        <span class="icon-arrow-right"></span>
+                    </router-link>
+                    <a
+                        v-else
+                        :href="item.url"
+                        class="list-navigation-item"
+                        :key="'other-external-' + navIndex + '-' + childIndex"
+                    >
+                        <span>{{ item.title }}</span>
+                        <span class="icon-arrow-right"></span>
+                    </a>
+                </template>
             </template>
         </div>
     </div>
 </template>
 
 <script>
+import navigationMixin from './mixins/navigationMixin'
 import { setPicSize } from 'mpfe-utils'
-import { mockNavItems } from '../../requests/mockData'
+
 export default {
-    name: "MobileNavigation",
-    data() {
-        return {
-            activeIndex: 0,
-            navItems: mockNavItems,
-        }
-    },
-    created() {
-        // 根据当前路由设置活跃项
-        this.setActiveFromRoute()
-    },
-    computed:{
-        firstNavList(){
-            return this.navItems?.[0]?.innerNews
-        },
-        secondNavItem(){
-            return this.navItems?.[1]
-        },
-        secondNavList(){
-            return this.navItems?.[1]?.innerNews
-        },
-        otherNavList(){
-            return this.navItems?.slice(2)
-        },
-    },
-    watch: {
-        $route() {
-            this.setActiveFromRoute()
-        },
-    },
+    name: 'MobileNavigation',
+    mixins: [navigationMixin],
     methods: {
-        navigateTo(route, index) {
-            const { routeName, url } = route
-            this.activeIndex = index
-            if(/^(https?:)?\/\//.test(url)){
-                window.location.href = url
-                return
-            }
-            // 检查当前路由是否已经是目标路由
-            if (this.$route.path != url) {
-                this.$router.push(url)
-            }
-            // 触发导航事件，通知父组件
-            this.$emit("navigate")
-        },
-        setActiveFromRoute() {
-            const currentPath = this.$route.path
-            const foundIndex = this.navItems.findIndex(
-                (item) => item.url === currentPath
-            )
-            if (foundIndex !== -1) {
-                this.activeIndex = foundIndex
-            }
-        },
-        getIconStyle(item){
+        getIconStyle(item) {
             const cover = item?.cover?.[0]
-            const cutCover = setPicSize(cover, 22*2, 22*2)
+            const cutCover = setPicSize(cover, 22 * 2, 22 * 2)
             return `background-image: url(${cutCover})`
-        }
+        },
+        isExternalLink(url) {
+            return /^(https?:)?\/\//.test(url)
+        },
     },
 }
 </script>
 
 <style lang="less" scoped>
-.mobile-navigation{
-    .nav-header{
+.mobile-navigation {
+    width: 100%;
+    .nav-header {
         font-weight: 500;
         font-size: 14px;
         color: var(--color-text-primary);
         line-height: 20px;
-        margin-bottom: 13px
+        margin-bottom: 13px;
     }
     .interact-navigation {
         background-color: var(--color-white);
@@ -146,7 +131,7 @@ export default {
             font-style: normal;
             cursor: pointer;
             flex: 1;
-            .icon-nav{
+            .icon-nav {
                 width: 22px;
                 height: 22px;
                 background-size: 100% 100%;
@@ -154,23 +139,23 @@ export default {
             }
         }
     }
-    .content-navigation{
+    .content-navigation {
         background-color: var(--color-white);
         border-radius: 4px;
         box-sizing: border-box;
         padding: 12px;
         margin: 0 16px 8px 16px;
-        .item-wrapper{
+        .item-wrapper {
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
-        .content-navigation-item{
+        .content-navigation-item {
             display: flex;
             align-items: center;
             flex-direction: column;
             flex: 1;
-            .content-icon-nav{
+            .content-icon-nav {
                 width: 32px;
                 height: 32px;
                 background-color: var(--color-background);
@@ -180,20 +165,20 @@ export default {
                 background-position: center;
                 margin-bottom: 5px;
             }
-            span{
+            span {
                 font-size: 12px;
                 color: var(--color-text-primary);
                 line-height: 16px;
             }
         }
     }
-    .list-navigation{
+    .list-navigation {
         background-color: var(--color-white);
         border-radius: 4px;
         box-sizing: border-box;
         padding: 12px;
         margin: 0 16px 8px 16px;
-        .list-navigation-item{
+        .list-navigation-item {
             padding: 10px 4px;
             box-sizing: border-box;
             width: 100%;
@@ -203,10 +188,10 @@ export default {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            .icon-arrow-right{
+            .icon-arrow-right {
                 width: 14px;
                 height: 14px;
-                background-image: url('../assets/images/icon_right_8e8e8e.png');
+                background-image: url('../../assets/images/icon_right_8e8e8e.png');
                 background-size: 100% 100%;
                 background-repeat: no-repeat;
                 background-position: center;

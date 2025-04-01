@@ -1,23 +1,14 @@
 <template>
-    <div class="router-view-container">
+    <div v-if="isShow" class="router-view-container">
         <transition :name="isMobile ? 'slide-right' : 'fade'" mode="out-in">
             <div
-                v-if="!isMobile || isContentActive"
+                v-if="isShow"
                 class="content-container"
-                :class="{ 'mobile-active': isMobile && isContentActive }"
+                :class="{ 'mobile-active': isMobileView }"
                 key="content-container"
             >
-                <TopHeader />
                 <div class="router-view-wrapper">
-                    <router-view v-slot="{ Component }">
-                        <transition :name="transitionName">
-                            <div class="transition-wrapper" :key="$route.fullPath">
-                                <keep-alive>
-                                    <component :is="Component" />
-                                </keep-alive>
-                            </div>
-                        </transition>
-                    </router-view>
+                    <router-view></router-view>
                 </div>
             </div>
         </transition>
@@ -25,25 +16,23 @@
 </template>
 
 <script>
-import { isMobile } from "../../composables/useResponsive"
 import { mapGetters } from 'vuex'
-import TopHeader from "../Header/TopHeader.vue"
 
 export default {
-    name: "RouterViewContainer",
-    components: {
-        TopHeader,
-    },
+    name: 'ContentView',
     data() {
         return {
-            transitionName: "fade",
-            lastRoutePath: "",
+            transitionName: 'fade',
+            lastRoutePath: '',
         }
     },
     computed: {
-        ...mapGetters(['isContentActive']),
-        isMobile() {
-            return isMobile.value
+        ...mapGetters(['isContentActive', 'isMobile']),
+        isShow() {
+            return !this.isMobile || this.isContentActive
+        },
+        isMobileView() {
+            return this.isMobile && this.isContentActive
         },
     },
     mounted() {
@@ -58,50 +47,42 @@ export default {
         // 设置过渡动画效果
         setTransitionEffect(to, from) {
             // 特殊处理：如果没有来源路由（首次加载）或目标是首页
-            if (!from.name || to.path === "/home") {
-                this.transitionName = "fade"
+            if (!from.name || to.path === '/home') {
+                this.transitionName = 'fade'
                 return
             }
 
             // 特殊处理：移动端导航返回
-            if (this.isMobile && from.path !== "/home" && to.path === "/home") {
-                this.transitionName = "slide-back"
+            if (this.isMobile && from.path !== '/home' && to.path === '/home') {
+                this.transitionName = 'slide-back'
                 return
             }
 
             // 通过路由路径分析导航方向
-            const toPathParts = to.path.split("/").filter(Boolean)
-            const fromPathParts = from.path.split("/").filter(Boolean)
+            const toPathParts = to.path.split('/').filter(Boolean)
+            const fromPathParts = from.path.split('/').filter(Boolean)
 
             // 比较路由深度和路径来判断方向
             if (toPathParts.length > fromPathParts.length) {
                 // 向更深层级导航
-                this.transitionName = "slide-forward"
+                this.transitionName = 'slide-forward'
             } else if (toPathParts.length < fromPathParts.length) {
                 // 返回上层
-                this.transitionName = "slide-back"
+                this.transitionName = 'slide-back'
             } else {
                 // 同级导航 - 比较路径部分确定是前进还是后退
-                const lastCommonIndex = this.findLastCommonPathIndex(
-                    toPathParts,
-                    fromPathParts
-                )
+                const lastCommonIndex = this.findLastCommonPathIndex(toPathParts, fromPathParts)
 
-                if (
-                    lastCommonIndex === -1 ||
-                    lastCommonIndex === toPathParts.length - 1
-                ) {
+                if (lastCommonIndex === -1 || lastCommonIndex === toPathParts.length - 1) {
                     // 完全不同的路径或最后一段相同 - 使用淡入淡出
-                    this.transitionName = "fade"
+                    this.transitionName = 'fade'
                 } else {
                     // 比较最后不同部分的字母顺序来决定方向
-                    const toNext = toPathParts[lastCommonIndex + 1] || ""
-                    const fromNext = fromPathParts[lastCommonIndex + 1] || ""
+                    const toNext = toPathParts[lastCommonIndex + 1] || ''
+                    const fromNext = fromPathParts[lastCommonIndex + 1] || ''
 
                     this.transitionName =
-                        toNext.localeCompare(fromNext) > 0
-                            ? "slide-forward"
-                            : "slide-back"
+                        toNext.localeCompare(fromNext) > 0 ? 'slide-forward' : 'slide-back'
                 }
             }
         },

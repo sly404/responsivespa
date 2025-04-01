@@ -1,81 +1,117 @@
 <template>
-    <div class="home-view" :class="{ mobile: isMobile, tablet: isTablet, desktop: isDesktop }">
-        <Header />
-        <UserInfo />
-        <!-- 导航组件 -->
-        <Navigation />
-        <!-- 路由视图容器 -->
-        <Content />
+    <div class="home-view" :class="contentClass">
+        <TopHeader :title="title" />
+        <UserInfo id="userInfo" />
+        <div class="home-view-content">
+            <!-- 导航组件 -->
+            <Navigation class="navigation" />
+            <!-- 路由视图容器 -->
+            <ContentView class="content-view" />
+        </div>
     </div>
 </template>
 
 <script>
-import {
-    isMobile,
-    isTablet,
-    isDesktop,
-    setupResizeListener,
-} from "../composables/useResponsive";
-import Navigation from "../components/Navigation/index.vue";
-import Content from "../components/Content/Index.vue";
-import Header from "../components/Header/Index.vue";
-import UserInfo from "../components/UserInfo.vue";
+import Navigation from '../components/Navigation/index.vue'
+import ContentView from './ContentView.vue'
+import TopHeader from '../components/Header/Index.vue'
+import UserInfo from '../components/UserInfo.vue'
 export default {
-    name: "HomeView",
+    name: 'HomeView',
     components: {
         Navigation,
-        Content,
-        Header,
+        ContentView,
+        TopHeader,
         UserInfo,
     },
     data() {
         return {
             cleanupListener: null,
-        };
+            title: '个人中心',
+        }
     },
     computed: {
         isMobile() {
-            return isMobile.value;
+            return this.$store.getters.isMobile
         },
         isTablet() {
-            return isTablet.value;
+            return this.$store.getters.isTablet
         },
         isDesktop() {
-            return isDesktop.value;
+            return this.$store.getters.isDesktop
         },
+        contentClass() {
+            return {
+                mobile: this.isMobile,
+                tablet: this.isTablet,
+                desktop: this.isDesktop,
+            }
+        },
+    },
+    created() {
+        // 初始化屏幕宽度
+        this.$store.dispatch('setScreenWidth', window.innerWidth)
+        // 获取用户信息
+        this.$store.dispatch('setUserInfo')
     },
     mounted() {
         // 设置窗口大小监听
-        this.cleanupListener = setupResizeListener();
+        this.cleanupListener = this.$store.dispatch('setupResizeListener')
     },
-    beforeDestroy() {
+    beforeUnmount() {
         // 清理窗口大小监听
         if (this.cleanupListener) {
-            this.cleanupListener();
+            this.cleanupListener()
         }
     },
-    methods: {
-    },
-};
+}
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .home-view {
     display: flex;
+    flex-direction: column;
     min-height: 100vh;
     background-color: var(--color-background);
     color: var(--color-text-primary);
-    font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
     overflow-x: hidden;
-    /* 防止水平滚动条出现 */
     position: relative;
-    /* 确保子元素绝对定位正确 */
     width: 100%;
-    /* 固定宽度防止动画过程中出现滚动条 */
+    .home-view-content {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+    }
 }
-
-/* 移动端样式 (小于 600px) */
-.home-view {
-    flex-direction: column;
+.mobile {
+    #userInfo {
+        margin-left: 16px;
+        margin-right: 16px;
+    }
+}
+.tablet {
+    #userInfo,
+    .home-view-content {
+        margin-left: 16px;
+        margin-right: 16px;
+    }
+    .navigation {
+        width: 134px;
+        margin-right: 12px;
+    }
+}
+.desktop {
+    #userInfo,
+    .home-view-content {
+        margin-left: auto;
+        margin-right: auto;
+        width: 930px;
+    }
+    .navigation {
+        width: 174px;
+        margin-right: 24px;
+        padding: 12px 24px !important;
+    }
 }
 </style>

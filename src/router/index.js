@@ -1,106 +1,134 @@
-import Vue from "vue"
-import VueRouter from "vue-router"
-import HomeView from "../views/HomeView.vue"
-import ContentView from "../components/Content/Index.vue"
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+import HomeView from '../views/HomeView.vue'
+
+const Message = () => import('../components/Content/Message/index.vue')
+const Follow = () => import('../components/Content/Follow/index.vue')
 
 Vue.use(VueRouter)
 
 // 路由配置
 const routes = [
     {
-        path: "/ucenter",
+        path: '/',
+        redirect: '/ucenter'
+    },
+    {
+        path: '/ucenter',
         meta: {
-            title: "个人中心",
+            title: '个人中心',
         },
         component: HomeView,
         children: [
             {
-                path: "messages",
-                name: "messages",
-                props: {
-                    title: "我的消息",
-                },
-                component: ContentView
-            },
-            {
-                path: "follow",
-                name: "follow",
+                path: 'messages',
+                name: 'messages',
                 meta: {
-                    title: "我的订阅",
+                    title: '我的消息',
                 },
-                component: ContentView
+                component: Message,
             },
             {
-                path: "/likeArticle",
-                name: "likeArticle",
+                path: 'follow',
+                name: 'follow',
                 meta: {
-                    title: "我的已赞",
+                    title: '我的订阅',
                 },
-                component: ContentView
+                component: Follow,
             },
             {
-                path: "favorites",
-                name: "favorites",
+                path: '/likeArticle',
+                name: 'likeArticle',
                 meta: {
-                    title: "我的收藏",
+                    title: '我的已赞',
                 },
-                component: ContentView
             },
             {
-                path: "history",
-                name: "history",
+                path: 'favorites',
+                name: 'favorites',
                 meta: {
-                    title: "浏览历史",
+                    title: '我的收藏',
                 },
-                component: ContentView
             },
             {
-                path: "comments",
-                name: "comments",
+                path: 'history',
+                name: 'history',
                 meta: {
-                    title: "评论管理",
+                    title: '浏览历史',
                 },
-                component: ContentView
             },
             {
-                path: "activities",
-                name: "activities",
+                path: 'comments',
+                name: 'comments',
                 meta: {
-                    title: "动态/讨论",
+                    title: '评论管理',
                 },
-                component: ContentView
             },
             {
-                path: "vision",
-                name: "vision",
-                meta: { 
-                    title: "视野",
-                },
-                component: ContentView
-            },
-            {
-                path: "feedback",
-                name: "feedback",
+                path: 'activities',
+                name: 'activities',
                 meta: {
-                    title: "意见反馈",
+                    title: '动态/讨论',
                 },
-                component: ContentView
             },
             {
-                path: "settings",
-                name: "settings",
+                path: 'vision',
+                name: 'vision',
                 meta: {
-                    title: "设置",
+                    title: '视野',
                 },
-                component: ContentView
             },
-        ]
+            {
+                path: 'feedback',
+                name: 'feedback',
+                meta: {
+                    title: '意见反馈',
+                },
+            },
+            {
+                path: 'settings',
+                name: 'settings',
+                meta: {
+                    title: '设置',
+                },
+            },
+            {
+                path: 'editInfo',
+                name: 'editInfo',
+                meta: {
+                    title: '编辑资料',
+                },
+                component: EditInfo,
+            },
+        ],
     },
 ]
 
 const router = new VueRouter({
-    mode: "history",
+    mode: 'history',
     routes,
+})
+
+// 路由前置钩子
+router.beforeEach((to, from, next) => {
+    const isToUcenterRoot = to.path === '/ucenter' || to.path === '/'
+    const isToChildRoute = to.path && to.path.match(/ucenter\/\w+$/)
+    const isContentActive = isToUcenterRoot ? false : isToChildRoute ? true : false
+    
+    // 确保 store 已经初始化
+    if (router.app.$store) {
+        router.app.$store.dispatch('setContentActive', isContentActive)
+        router.app.$store.dispatch('setIsInRoot', isToUcenterRoot)
+    }
+    next()
+})
+
+// 路由后置钩子
+router.afterEach((to) => {
+    // 更新页面标题
+    if (to.meta.title) {
+        document.title = to.meta.title
+    }
 })
 
 export default router

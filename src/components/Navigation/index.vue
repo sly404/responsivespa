@@ -1,34 +1,25 @@
 <template>
-    <div class="app-navigation">
-        <!-- 移动端使用MobileNavigation -->
-        <MobileNavigation v-if="showMobileNavigation" @navigate="onMobileNavigate"/>
-        <!-- 平板和桌面端使用DesktopNavigation -->
-        <DesktopNavigation v-if="showDesktopNavigation"/>
-    </div>
+    <!-- 移动端使用MobileNavigation -->
+    <MobileNavigation v-if="showMobileNavigation" />
+    <!-- 平板和桌面端使用DesktopNavigation -->
+    <DesktopNavigation v-else-if="showDesktopNavigation" />
 </template>
 
 <script>
-import { screenWidth,isMobile } from "../../composables/useResponsive"
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters } from 'vuex'
 
 // 动态按需导入导航组件 - 使用Vue 2的方式
-const MobileNavigation = () => import("./MobileNavigation.vue")
-const DesktopNavigation = () => import("./DesktopNavigation.vue")
+const MobileNavigation = () => import('./MobileNavigation.vue')
+const DesktopNavigation = () => import('./SideNavigation.vue')
 
 export default {
-    name: "AppNavigation",
+    name: 'AppNavigation',
     components: {
         MobileNavigation,
         DesktopNavigation,
     },
     computed: {
-        ...mapGetters(['isContentActive']),
-        screenWidth() {
-            return screenWidth.value
-        },
-        isMobile() {
-            return isMobile.value
-        },
+        ...mapGetters(['isContentActive', 'screenWidth', 'isMobile']),
         showMobileNavigation() {
             return this.isMobile && !this.isContentActive
         },
@@ -36,14 +27,7 @@ export default {
             return !this.isMobile
         },
     },
-    methods: {
-        ...mapActions(['setContentActive']),
-        onMobileNavigate() {
-            this.setContentActive(true)
-        },
-    },
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
