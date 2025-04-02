@@ -1,6 +1,5 @@
 <template>
-    <DesktopHeader v-if="isDesktop"></DesktopHeader>
-    <MobileHeader v-else :title="title"></MobileHeader>
+    <component :is="currentHeader" :title="title"></component>
 </template>
 
 <script>
@@ -20,9 +19,16 @@ export default {
         DesktopHeader,
     },
     computed: {
-        ...mapGetters(['isDesktop']),
+        ...mapGetters(['isDesktopHeader']),
+        currentHeader() {
+            return this.isDesktopHeader ? DesktopHeader : MobileHeader
+        }
     },
 }
 </script>
 
-<style></style>
+<style lang="less" scoped>
+.top-header {
+    background-color: var(--color-background) !important;
+}
+</style>

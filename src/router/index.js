@@ -4,6 +4,10 @@ import HomeView from '../views/HomeView.vue'
 
 const Message = () => import('../components/Content/Message/index.vue')
 const Follow = () => import('../components/Content/Follow/index.vue')
+const EditInfo = () => import('../components/Content/EditInfo/Index.vue')
+const Comment = () => import('../components/Content/Comment/Index.vue')
+const MyComment = () => import('../components/Content/Comment/MyComment.vue')
+const ReplyMe = () => import('../components/Content/Comment/ReplyMe.vue')
 
 Vue.use(VueRouter)
 
@@ -63,6 +67,19 @@ const routes = [
                 meta: {
                     title: '评论管理',
                 },
+                component: Comment,
+                children: [
+                    {
+                        path: 'myComment',
+                        name: 'myComment',
+                        component: MyComment,
+                    },
+                    {
+                        path: 'replyMe',
+                        name: 'replyMe',
+                        component: ReplyMe,
+                    },
+                ],
             },
             {
                 path: 'activities',
@@ -109,22 +126,20 @@ const router = new VueRouter({
     routes,
 })
 
-// 路由前置钩子
-router.beforeEach((to, from, next) => {
-    const isToUcenterRoot = to.path === '/ucenter' || to.path === '/'
-    const isToChildRoute = to.path && to.path.match(/ucenter\/\w+$/)
-    const isContentActive = isToUcenterRoot ? false : isToChildRoute ? true : false
-    
-    // 确保 store 已经初始化
-    if (router.app.$store) {
-        router.app.$store.dispatch('setContentActive', isContentActive)
-        router.app.$store.dispatch('setIsInRoot', isToUcenterRoot)
-    }
-    next()
-})
+
 
 // 路由后置钩子
 router.afterEach((to) => {
+    const isToUcenterRoot = to.path === '/ucenter' || to.path === '/'
+    const isToChildRoute = to.path && to.path.match(/^\/ucenter\/.*/)
+    const isContentActive = isToUcenterRoot ? false : isToChildRoute ? true : false
+    const store = router.app.$store
+    if (store && typeof store.dispatch === 'function') {
+        // 设置contentActive状态
+        store.dispatch('setContentActive', isContentActive)
+        // 设置isInRoot状态
+        store.dispatch('setIsInRoot', isToUcenterRoot)
+    }
     // 更新页面标题
     if (to.meta.title) {
         document.title = to.meta.title

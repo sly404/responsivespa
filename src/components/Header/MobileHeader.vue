@@ -70,7 +70,7 @@ export default {
 <style lang="less" scoped>
 .top-header {
     height: 44px;
-    background-color: var(--color-background);
+    background-color: var(--color-white);
     .fixed-header {
         display: flex;
         align-items: center;
@@ -78,7 +78,6 @@ export default {
         height: 44px;
         box-sizing: border-box;
         padding: 12px;
-        background-color: var(--color-background);
         position: sticky;
         top: 0;
         z-index: 3;

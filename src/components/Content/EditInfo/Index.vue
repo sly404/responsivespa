@@ -3,24 +3,30 @@
         <MobileHeader v-if="isMobile" />
         <div v-else class="content-text edit-head">编辑资料</div>
         <div class="avatar-container">
-            <div class="left-text">头像</div>
+            <div class="content-text left-text">头像</div>
             <div class="avatar-box">
-                <img src="@/assets/images/avatar.png" alt="avatar" class="avatar-img">
+                <img :src="avatar" alt="avatar" class="avatar-img">
                 <span class="avatar-select"></span>
             </div>
         </div>
         <div class="nickname-container">
-            <div class="left-text">昵称</div>
+            <div class="content-text left-text">昵称</div>
             <div class="nickname-box">
-                <div class="nickname-input">{{ nickname }}</div>
+                <div class="content-text nickname-input">{{ nickname }}</div>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+import MobileHeader from '../../Header/MobileHeader.vue'
+
 export default {
     name: 'EditInfo',
+    components: {
+        MobileHeader,
+    },
     computed: {
         ...mapGetters(['isMobile', 'nickname', 'avatar']),
     },
@@ -39,6 +45,7 @@ export default {
     .content-text{
         font-size: 16px;
         line-height: 22px;
+        white-space: nowrap;
     }
     .edit-head {
         width: 100%;
@@ -66,9 +73,10 @@ export default {
             width: 68px;
             height: 68px;
             box-sizing: border-box;
+            position: relative;
             .avatar-img{
-                width: 100%;
-                height: 100%;
+                width: 68px;
+                height: 68px;
                 border-radius: 50%;
                 overflow: hidden;
             }
@@ -78,11 +86,15 @@ export default {
                 align-items: center;
                 width: 24px;
                 height: 24px;
+                border-radius: 50%;
                 background-color: #111111;
-                background-image: url('@/assets/images/avatar-select.png');
+                background-image: url('@/assets/images/icon_avatar_select.png');
                 background-repeat: no-repeat;
                 background-position: center;
-                background-size: 100% 100%;
+                background-size: 12px 12px;
+                position: absolute;
+                bottom: 0;
+                right: 0;
             }
         }
     }
@@ -93,7 +105,12 @@ export default {
         .nickname-box{
             margin-left: 36px;
             width: 100%;
-            height: 48px;  
+            height: 48px;
+            .nickname-input{
+                font-weight: 400;
+                color: var(--color-text-secondary);
+                line-height: 48px;
+            }  
         }
     }
 }

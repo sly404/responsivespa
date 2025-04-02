@@ -124,7 +124,7 @@ export default {
     right: 0;
     bottom: 0;
     z-index: 100;
-    background-color: var(--color-background);
+    background-color: var(--color-white);
     width: 100vw; /* 使用视口宽度单位 */
     overflow-x: hidden;
 }

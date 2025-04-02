@@ -7,6 +7,8 @@ Vue.use(Vuex)
 export const BREAKPOINTS = {
     MOBILE: 600,
     TABLET: 840,
+    DeskTop: 930,
+    DeskTopHeader: 1180,
 }
 
 export default new Vuex.Store({
@@ -75,8 +77,9 @@ export default new Vuex.Store({
         screenWidth: (state) => state.screenWidth,
         isMobile: (state) => state.screenWidth < BREAKPOINTS.MOBILE,
         isTablet: (state) =>
-            state.screenWidth >= BREAKPOINTS.MOBILE && state.screenWidth < BREAKPOINTS.TABLET,
-        isDesktop: (state) => state.screenWidth >= BREAKPOINTS.TABLET,
+            state.screenWidth >= BREAKPOINTS.MOBILE && state.screenWidth < BREAKPOINTS.DeskTop,
+        isDesktop: (state) => state.screenWidth >= BREAKPOINTS.DeskTop,
+        isDesktopHeader: (state) => state.screenWidth >= BREAKPOINTS.DeskTopHeader,
         viewType: (state) => {
             if (state.screenWidth < BREAKPOINTS.MOBILE) {
                 return 'mobile'

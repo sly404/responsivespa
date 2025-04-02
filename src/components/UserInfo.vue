@@ -4,7 +4,7 @@
             <img :src="placeholderAvatar" alt="用户头像" />
         </div>
         <h3 class="username">搜狐用户P339</h3>
-        <span class="edit-profile">
+        <span class="edit-profile" @click="editProfile">
             <span class="edit-profile-text">编辑</span>
             <i class="icon-right"></i>
         </span>
@@ -21,6 +21,11 @@ export default {
             placeholderAvatar,
         }
     },
+    methods: {
+        editProfile() {
+            this.$router.push({name: 'editInfo'})
+        }
+    }
 }
 </script>
 
