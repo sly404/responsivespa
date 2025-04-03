@@ -12,7 +12,7 @@
 
 <script>
 import { getEnvironmentByURL } from 'mpfe-utils'
-import { mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 
 export default {
     name: 'MobileHeader',
@@ -23,7 +23,7 @@ export default {
         },
     },
     computed: {
-        ...mapGetters(['isInRoot']),
+        ...mapState(['isInRoot']),
         headerTitle() {
             return (
                 this.title ||

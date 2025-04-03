@@ -1,12 +1,13 @@
 <template>
-    <div class="my-comment">
-        <MobileHeader title="评论"></MobileHeader>
+    <div class="comment">
+        <MobileHeader v-if="isMobile" title="评论"></MobileHeader>
         <SwitchTab :tabs="tabs" @switchTab="handleSwitchTab"></SwitchTab>
         <router-view></router-view>
     </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import MobileHeader from '../../Header/MobileHeader.vue'
 import SwitchTab from '../../SwitchTab.vue'
 export default {
@@ -14,6 +15,9 @@ export default {
     components: {
         MobileHeader,
         SwitchTab
+    },
+    computed: {
+        ...mapGetters(['isMobile'])
     },
     data() {
         return {
@@ -30,18 +34,17 @@ export default {
     },
     methods: {
         handleSwitchTab(tab) {
-            this.$router.push({
-                name: tab.routeName,
-            })
         }
     }
 }
 </script>
 
 <style lang="less" scoped>
-.my-comment {
+.comment {
     width: 100%;
     height: 100%;
     background-color: #fff;
+    display: flex;
+    flex-direction: column;
 }
 </style>

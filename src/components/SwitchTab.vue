@@ -12,7 +12,8 @@
                         {{ tab.name }}
                     </router-link>
                     <div 
-                        class="tab-item" v-else
+                        v-else
+                        class="tab-item" 
                         :key="index"
                         :class="{ active: currentTabIndex === index }"
                         @click="handleTabClick(tab, index)"
@@ -89,8 +90,7 @@ export default {
             deep: true
         },
         currentTabIndex: {
-            handler(curVal, oldVal) {
-                console.log('curVal', curVal)
+            handler() {
                 this.updateUnderLineStyle()
             },
             immediate: true

@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 
 // 动态按需导入导航组件 - 使用Vue 2的方式
 const MobileNavigation = () => import('./MobileNavigation.vue')
@@ -19,7 +19,8 @@ export default {
         DesktopNavigation,
     },
     computed: {
-        ...mapGetters(['isContentActive', 'screenWidth', 'isMobile']),
+        ...mapGetters(['isMobile']),
+        ...mapState(['isContentActive']),
         showMobileNavigation() {
             return this.isMobile && !this.isContentActive
         },

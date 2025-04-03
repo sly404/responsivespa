@@ -136,9 +136,9 @@ router.afterEach((to) => {
     const store = router.app.$store
     if (store && typeof store.dispatch === 'function') {
         // 设置contentActive状态
-        store.dispatch('setContentActive', isContentActive)
+        store.commit('setContentActive', isContentActive)
         // 设置isInRoot状态
-        store.dispatch('setIsInRoot', isToUcenterRoot)
+        store.commit('setIsInRoot', isToUcenterRoot)
     }
     // 更新页面标题
     if (to.meta.title) {

@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
     name: 'ContentView',
@@ -27,7 +27,8 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(['isContentActive', 'isMobile']),
+        ...mapGetters(['isMobile']),
+        ...mapState(['isContentActive']),
         isShow() {
             return !this.isMobile || this.isContentActive
         },

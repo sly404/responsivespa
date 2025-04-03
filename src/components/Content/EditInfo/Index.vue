@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import MobileHeader from '../../Header/MobileHeader.vue'
 
 export default {
@@ -28,7 +28,8 @@ export default {
         MobileHeader,
     },
     computed: {
-        ...mapGetters(['isMobile', 'nickname', 'avatar']),
+        ...mapGetters(['isMobile']),
+        ...mapState(['nickname', 'avatar']),
     },
     data() {
         return {

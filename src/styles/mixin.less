@@ -1,0 +1,8 @@
+/* 限制几行显示省略号 */
+.line-clamp(@clamp:2) {
+    /*私有属性*/
+    display: -webkit-box;
+    -webkit-line-clamp: @clamp;
+    word-break: break-all;
+    -webkit-box-orient: vertical;
+}

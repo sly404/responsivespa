@@ -50,7 +50,7 @@ export default {
     },
     created() {
         // 初始化屏幕宽度
-        this.$store.dispatch('setScreenWidth', window.innerWidth)
+        this.$store.commit('setScreenWidth', window.innerWidth)
         // 获取用户信息
         this.$store.dispatch('setUserInfo')
     },
