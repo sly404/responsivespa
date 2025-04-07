@@ -2,6 +2,8 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import { getUserInfo } from '../requests/userRequest'
 import { addLike, deleteComment } from '../requests/commentRequest'
+import ui from './modules/ui'
+
 Vue.use(Vuex)
 
 // 定义屏幕尺寸断点
@@ -15,6 +17,9 @@ export const BREAKPOINTS = {
 const defaultNickname = '狐狐网友'
 const defaultAvatar = '//statics.itc.cn/mobile/ucenter/images/ic_home_photo_gray.png'
 export default new Vuex.Store({
+    modules: {
+        ui,
+    },
     state: {
         isContentActive: false,
         isInRoot: true,
@@ -23,30 +28,30 @@ export default new Vuex.Store({
         nickname: defaultNickname,
         avatar: defaultAvatar,
         showImgView: false, // 是否显示预览图片
-        viewImgUrl: '', // 预览图片的url
-        viewImgOrigin: '', // 预览图片的原始位置
-        isShowConfirm: false, // 是否显示删除确认框
-        deleteCommentInfo: null, // 删除评论信息
+        viewImgUrl: "", // 预览图片的url
+        viewImgOrigin: "", // 预览图片的原始位置
         myCommentList: [], // 我的评论列表
         replyCommentList: [], // 回复评论列表
         commentsSum: 0, // 评论总数
         toast: {
             toastShow: false,
-            toastText: '',
-            toastStatus: ''
+            toastText: "",
+            toastStatus: "",
         },
-        replyComment: { // 点击回复的评论数据
-            topic_title: '',
-            source_id: '',
-            topic_url: '',
-            reply_id: '',
-            channel_id: '',
+        replyComment: {
+            // 点击回复的评论数据
+            topic_title: "",
+            source_id: "",
+            topic_url: "",
+            reply_id: "",
+            channel_id: "",
         },
-        currentReply: { // 当前回复的信息
+        currentReply: {
+            // 当前回复的信息
             replyShow: false,
-            username: '',
+            username: "",
             scrollY: 0,
-        }
+        },
     },
     mutations: {
         SET_NICKNAME(state, nickname) {
@@ -56,6 +61,7 @@ export default new Vuex.Store({
             state.avatar = avatar
         },
         DELETE_COMMENT(state, commentInfo) {
+            debugger
             const { index } = commentInfo
             state.myCommentList.splice(index, 1)
             state.commentsSum = state.commentsSum - 1
@@ -123,57 +129,39 @@ export default new Vuex.Store({
         setViewImgOrigin(state, origin) {
             state.viewImgOrigin = origin
         },
-        toggleDeleteConfirm(state, commentInfo) {
-            state.isShowConfirm = !state.isShowConfirm
-            if(state.isShowConfirm) {
-                state.deleteCommentInfo = commentInfo
-            } else {
-                state.deleteCommentInfo = null
-            }
-        },
     },
     actions: {
         // 初始化窗口大小监听
         setupResizeListener({ commit }) {
             const handleResize = () => {
-                commit('setScreenWidth', window.innerWidth)
+                commit("setScreenWidth", window.innerWidth)
             }
             // 添加窗口大小变化监听
-            window.addEventListener('resize', handleResize)
+            window.addEventListener("resize", handleResize)
             // 返回清理函数
             return () => {
-                window.removeEventListener('resize', handleResize)
+                window.removeEventListener("resize", handleResize)
             }
         },
         async setUserInfo({ commit }) {
-            const type = this.getters.isMobile ? 'mobile' : 'pc'
+            const type = this.getters.isMobile ? "mobile" : "pc"
             const userInfo = await getUserInfo(type)
             if (userInfo) {
-                commit('SET_NICKNAME', userInfo.nickname)
-                commit('SET_AVATAR', userInfo.avatar)
+                commit("SET_NICKNAME", userInfo.nickname)
+                commit("SET_AVATAR", userInfo.avatar)
             }
         },
         async deleteComment({ commit }, commentInfo) {
             const { sourceId, commentId } = commentInfo
             try {
-                const res = await deleteComment(sourceId, commentId)
-                if(res.code === 1) {
-                    commit('DELETE_COMMENT', commentInfo)
-                    commit('TOGGLE_TOAST',{
-                        text: '删除成功',
-                        status: 'success'
-                    })
-                }else{
-                    commit('TOGGLE_TOAST',{
-                        text: '删除失败',
-                        status: 'warn'
-                    })
+                const isSuccess = await deleteComment({ source_id: sourceId, comment_id: commentId })
+                if (isSuccess) {
+                    commit("DELETE_COMMENT", commentInfo)
+                } else {
+                    throw new Error("删除失败")
                 }
             } catch (error) {
-                commit('TOGGLE_TOAST',{
-                    text: '删除失败',
-                    status: 'warn'
-                })
+                throw error
             }
         },
         /**
@@ -187,30 +175,35 @@ export default new Vuex.Store({
         async addReplyLike({ commit }, params) {
             const { sourceId, commentId, index } = params
             try {
-                await addLike({sourceId, commentId})
-                commit('ADD_REPLY_LIKE', index)
+                await addLike({ sourceId, commentId })
+                commit("ADD_REPLY_LIKE", index)
             } catch (error) {
-                commit('TOGGLE_TOAST',{
-                    text: '点赞出错啦！',
-                    status: 'warn',
+                commit("TOGGLE_TOAST", {
+                    text: "点赞出错啦！",
+                    status: "warn",
                 })
             }
-        }
+        },
     },
     getters: {
         isMobile: (state) => state.screenWidth < BREAKPOINTS.MOBILE,
         isTablet: (state) =>
-            state.screenWidth >= BREAKPOINTS.MOBILE && state.screenWidth < BREAKPOINTS.DeskTop,
+            state.screenWidth >= BREAKPOINTS.MOBILE &&
+            state.screenWidth < BREAKPOINTS.DeskTop,
         isDesktop: (state) => state.screenWidth >= BREAKPOINTS.DeskTop,
-        isDesktopHeader: (state) => state.screenWidth >= BREAKPOINTS.DeskTopHeader,
+        isDesktopHeader: (state) =>
+            state.screenWidth >= BREAKPOINTS.DeskTopHeader,
         viewType: (state) => {
             if (state.screenWidth < BREAKPOINTS.MOBILE) {
-                return 'mobile'
+                return "mobile"
             }
-            if (state.screenWidth >= BREAKPOINTS.MOBILE && state.screenWidth < BREAKPOINTS.DeskTop) {
-                return 'tablet'
+            if (
+                state.screenWidth >= BREAKPOINTS.MOBILE &&
+                state.screenWidth < BREAKPOINTS.DeskTop
+            ) {
+                return "tablet"
             }
-            return 'desktop'
+            return "desktop"
         },
     },
 })

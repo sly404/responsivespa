@@ -170,3 +170,7 @@ export const fetchData = async (params) => {
 - 通过CSS变量统一管理主题色、间距、字体大小等
 - 组件样式使用scoped CSS，确保样式隔离
 
+### 一些公共组件
+- 切换tab组件：components/SwitchTab.vue,通过引入组件复用
+- 确认弹窗组件： components/ConfirmBox.vue,通过原型方法this.$confirm复用
+

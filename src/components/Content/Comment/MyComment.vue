@@ -1,5 +1,8 @@
 <template>
-    <div class="my-comment">
+    <div 
+        class="my-comment" 
+        ref="myComment" 
+        @scroll.passive="handleScroll">
         <CommentList
             v-if="isShow" 
             :comments="myCommentList" 
@@ -16,6 +19,7 @@
 import CommentList from './CommentList.vue'
 import { mapState } from 'vuex'
 import { getMyCommentList } from '../../../requests/commentRequest'
+import { throttle } from 'mpfe-utils'
 
 export default {
     name: 'MyComment',
@@ -28,6 +32,7 @@ export default {
             spmCCode: 'my-comment',
             isLoading: false,
             finished: false,
+            scrollFunc: null,  // 添加防抖定时器
         }
     },
     computed:{
@@ -92,13 +97,29 @@ export default {
                 const sum = this.$store.state.commentsSum + res.data.length;
                 this.$store.commit('setCommentSum', sum);
             } catch (error) {
-                this.isLoading = false;
                 console.log('获取评论失败',error);
+            } finally {
+                this.isLoading = false;
             }
         },
         getMoreComments(){
             this.pageNo++;
             this.getMyCommentList();
+        },
+        handleScroll() {
+            if(!this.scrollFunc) {
+                this.scrollFunc = throttle(() => {
+                    const container = this.$refs.myComment;
+                    const scrollHeight = container.scrollHeight;
+                    const scrollTop = container.scrollTop;
+                    const clientHeight = container.clientHeight;
+                    // 当距离底部小于100px且不在加载中且未加载完时，触发加载
+                    if (scrollHeight - scrollTop - clientHeight < 100 && !this.isLoading && !this.finished) {
+                        this.getMoreComments();
+                    }
+                }, 150)
+            }
+            this.scrollFunc()
         }
     }
 }

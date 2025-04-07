@@ -20,6 +20,20 @@ export const getMyCommentList = async (params) => {
     }
 }
 
+export const getReplyList = async (params) => {
+    const uri = '/comment/api/personal/replies'
+    const defaultParams = {
+        pageNo: 1,
+        pageSize: 15,
+    }
+    try {
+        const res = await ucenterApi.get(uri,{ params: { ...defaultParams, ...params } })
+        return res
+    } catch (error) {
+        throw error
+    }
+}
+
 /**
  * 添加点赞
  * @param {*} params 
@@ -47,8 +61,12 @@ export const addLike = async (params) => {
 export const deleteComment = async (params) => {
     const uri = '/comment/api/comments/remove'
     try {
-        const { data } = await ucenterApi.post(uri, params)
-        if(data?.code === 200) {
+        const res = await ucenterApi.post(uri, params, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+            },
+        })
+        if(res?.code === 200) {
             return true
         }
         return false

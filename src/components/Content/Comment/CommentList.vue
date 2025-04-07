@@ -88,18 +88,28 @@ export default {
 </script>
 
 <style scoped lang="less">
-    .comment-list-wrapper{
-        padding: 0 30px;
-        .comment-list-wrapper-loading {
-            font-size: 24px; /*px*/
-            text-align: center;
-            margin: 40px 0;
-            color: #a5a5a5;
-            .glyph {
-                display: inline-block;
-                margin-left: 18px;
-                animation: rotating 0.8s linear infinite;
-            }
+@keyframes rotating {
+    0% {
+        transform: rotate(0);
+    }
+    50% {
+        transform: rotate(180deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+.comment-list-wrapper{
+    .comment-list-wrapper-loading {
+        font-size: 12px; /*px*/
+        text-align: center;
+        margin: 20px 0;
+        color: #a5a5a5;
+        .glyph {
+            display: inline-block;
+            margin-left: 18px;
+            animation: rotating 0.8s linear infinite;
         }
     }
+}
 </style>

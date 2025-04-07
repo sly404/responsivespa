@@ -29,25 +29,13 @@ export default {
 <style scoped lang="less">
     .avatar-wrapper {
         display: inline-block;
-        width: 144px;
-        height: 144px;
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
         overflow: hidden;
         img {
             width: 100%;
             height: 100%;
-        }
-        &.order {
-            width: 46px;
-            height: 46px;
-        }
-        &.small{
-            width: 80px;
-            height: 80px;
-        }
-        &.big{
-            width: 102px;
-            height: 102px;
         }
         &.noborder{
             border: none;

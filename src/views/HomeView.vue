@@ -64,6 +64,41 @@ export default {
             this.cleanupListener()
         }
     },
+    methods: {
+        showDeleteConfirm() {
+            this.$confirm({
+                title: '确定要删除此项吗？',
+                confirmText: '删除',
+                cancelText: '取消'
+            }).then(() => {
+                alert('已确认删除')
+            }).catch(() => {
+                // 用户取消操作
+            })
+        },
+        showPublishConfirm() {
+            this.$confirm({
+                title: '确定要发布文章吗？',
+                confirmText: '发布',
+                cancelText: '稍后'
+            }).then(() => {
+                alert('已确认发布')
+            }).catch(() => {
+                // 用户取消操作
+            })
+        },
+        showCustomConfirm() {
+            this.$confirm({
+                title: '您确定要执行此操作吗？',
+                confirmText: '确定',
+                cancelText: '我再想想'
+            }).then(() => {
+                alert('操作已执行')
+            }).catch(() => {
+                // 用户取消操作
+            })
+        }
+    }
 }
 </script>
 
@@ -112,6 +147,31 @@ export default {
         width: 174px;
         margin-right: 24px;
         padding: 12px 24px !important;
+    }
+}
+
+.confirm-test {
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+    
+    .test-btn {
+        padding: 10px 15px;
+        background: #4285f4;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        
+        &:hover {
+            background: #3367d6;
+        }
     }
 }
 </style>

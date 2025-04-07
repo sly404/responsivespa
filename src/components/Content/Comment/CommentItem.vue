@@ -1,87 +1,64 @@
 <template>
-    <!-- 我的评论 -->
-    <div
-        class="comment-item-wrapper"
-        :class="{ deleting: data.comment.isDeleting, deleted: data.comment.isDeleted }"
-        v-if="type == 'comment'"
+    <div 
+        class="comment-item-wrapper" 
+        :class="{ deleting: isDeleting, deleted: isDeleted }"
         data-spm-type="resource"
         :data-spm-content="spmContent"
     >
+        <!-- 评论头部 -->
         <div class="comment-item-title">
             <div class="userHead">
-                <avatar type="small" :url="avatar"></avatar>
+                <avatar type="small" :url="isMyComment ? avatar : userAvatar"></avatar>
             </div>
             <div class="item-title">
-                <span class="userName">{{ nickname }}</span>
+                <span class="userName">
+                    {{ isMyComment ? nickname : userNameWithReply }}
+                </span>
             </div>
         </div>
+        
+        <!-- 评论内容区 -->
         <div class="comment-item-content">
+            <!-- 评论文本 -->
             <div class="comment-discuss">
                 <CommentText :text="commentContent"></CommentText>
             </div>
-            <div 
-                v-if="data.comment.attachment"
-                class="attachment"
-                @click.stop="handleImgClick(data, $event)">
-                <img :src="cutCommentImg(data.comment.attachment)">
-            </div>
-            <div class="comment-inner-discuss">
-                <clamp :content="innerReplyContent" :img="replyImg"></clamp>
-                <a class="origin" href="javascript:void(0)" @click="clickOrigin">
-                    {{ topicTitle }}
-                </a>
-            </div>
-            <div class="comment-item-footer">
-                <span class="date">{{ date }}</span>
-                <span v-if="statusInfo" class="status-info">{{statusInfo}}</span>
-                <span class="delete" @click="clickDelete"></span>
-            </div>
-        </div>
-    </div>
-    <!-- 回复我的 -->
-    <div 
-        v-else
-        class="comment-item-wrapper" 
-        data-spm-type="resource"
-        :data-spm-content="spmContent">
-        <div class="comment-item-title">
-            <div class="userHead">
-                <avatar type="small" :url="data.user && data.user.avatar"></avatar>
-            </div>
-            <div class="item-title">
-                <span class="userName">{{ data.user && data.user.username }} 回复了我：</span>
-            </div>
-        </div>
-        <div class="comment-item-content">
-            <div class="comment-discuss">
-                <CommentText :text="commentContent"></CommentText>
-            </div>
+            
+            <!-- 评论附件（图片） -->
             <div 
                 v-if="attachment"
                 class="attachment"
-                @click.stop="handleImgClick(data, $event)">
+                @click.stop="handleImgClick($event)">
                 <img :src="cutCommentImg(attachment)">
             </div>
-            <div class="comment-inner-discuss">
-                <clamp :content="innerReplyContent" :img="replyImg"></clamp>
+            
+            <!-- 来源信息内容：被回复的评论内容和评论的原文信息 -->
+            <div class="comment-origin">
+                <clamp v-if="showInnerReply" :content="innerReplyContent" :img="replyImg"></clamp>
                 <a class="origin" href="javascript:void(0)" @click="clickOrigin">
                     {{ topicTitle }}
                 </a>
             </div>
+            
+            <!-- 评论底部 -->
             <div class="comment-item-footer">
                 <span class="date">{{ date }}</span>
-                <div class="like" @click="clickLike">
-                     <i
-                        :class="[
-                            'glyph',
-                            showLikeIcon ? 'glyph-like-s' : 'glyph-like'
-                        ]"
-                    ></i>
-                    <em class="like-count" v-if="data.comment.likeCount">{{ data.comment.likeCount }}</em>
-                </div>
-                <div class="comment" @click="clickComment">
-                    <i class="glyph glyph-comment"></i>
-                </div>
+                <!-- 状态信息（仅对自己的评论显示） -->
+                <span v-if="statusInfo" class="status-info">{{statusInfo}}</span>
+                
+                <!-- 操作区：删除、点赞或回复 -->
+                <template v-if="isMyComment">
+                    <span class="delete" @click="clickDelete"></span>
+                </template>
+                <template v-else>
+                    <div class="like" @click="clickLike">
+                        <i :class="['glyph', showLikeIcon ? 'glyph-like-s' : 'glyph-like']"></i>
+                        <em class="like-count" v-if="likeCount">{{ likeCount }}</em>
+                    </div>
+                    <div class="comment" @click="clickComment">
+                        <i class="glyph glyph-comment"></i>
+                    </div>
+                </template>
             </div>
         </div>
     </div>
@@ -91,130 +68,195 @@
 // components
 import Avatar from './Avatar.vue'
 import Clamp from './Clamp.vue'
-// util
-import { sendSpmAction, setPicSize } from 'mpfe-utils'
 import CommentText from 'common-components/lib/commentText/index'
 import 'common-components/lib/commentText/index.css'
+
+// utils
+import { sendSpmAction, setPicSize } from 'mpfe-utils'
 import { mapActions, mapState } from 'vuex'
 import { initDate } from '../../../utils/index'
 import { acodeConfig } from '../../../config/spmConfig'
 
 export default {
+    name: 'CommentItem',
+    components: {
+        avatar: Avatar,
+        clamp: Clamp,
+        CommentText,
+    },
     props: {
         type: {
             type: String,
-            default: 'comment',
+            default: 'comment', // 'comment'：我的评论, 其他值：回复我的
         },
         data: {
             type: Object,
-            default: function () {
-                return {}
-            },
+            default: () => ({})
         },
         index: {
             type: Number,
             default: 0,
         },
     },
-    components: {
-        avatar: Avatar,
-        clamp: Clamp,
-        CommentText,
-    },
+    
     data() {
         return {
             isLike: false
         }
     },
+    
     computed: {
         ...mapState(['nickname', 'avatar']),
-        commentId(){
-            return this.data.comment && this.data.comment.id
+        // 基础数据计算属性
+        isMyComment() {
+            return this.type === 'comment'
         },
-        sourceId(){
-            return this.data.topic && this.data.topic.sourceId
+        comment() {
+            return this.data.comment || {}
+        },
+        topic() {
+            return this.data.topic || {}
+        },
+        // 状态相关
+        isDeleting() {
+            return this.comment.isDeleting
+        },
+        isDeleted() {
+            return this.comment.isDeleted
+        },
+        // 用户信息
+        userAvatar() {
+            return this.data.user?.avatar
+        },
+        userNameWithReply() {
+            return `${this.data.user?.username || ''} 回复了我：`
+        },
+        // 评论内容相关
+        commentId() {
+            return this.comment.id
         },
         commentContent() {
-            return this.data.comment?.richContent
+            return this.comment.richContent
         },
-        topicTitle(){
-            return this.data.topic && this.data.topic.topicTitle
+        sourceId() {
+            return this.topic.sourceId
         },
-        topicLink(){
-            return this.data.topic && this.data.topic.topicLink
+        topicTitle() {
+            return this.topic.topicTitle
         },
-        innerReplyContent() {
-            if(this.type === 'comment') return ''
-            let result = ''
-            const userName = this.nickname
-            const parentCommentContent = this.data.comment.parents?.[0]?.richContent
-            if (this.data.comment && this.data.comment.parents && this.data.comment.parents[0]) {
-                result = this.data.comment.parents[0].displayStatus
-                    ? `${userName} : ${parentCommentContent ? parentCommentContent : ''}`
-                    : `${userName} : 该条评论已删除!`
-            } else {
-                result = `${userName} : 该条评论已删除!`
-            }
-            return result
+        topicLink() {
+            return this.topic.topicLink
         },
-        attachment(){
-            return this.data.comment.attachment
-        },
-        channelId(){
-            return this.data.topic.channelId
-        },
-        replyImg(){
-            return this.data?.comment?.parents?.[0]?.attachment
+        channelId() {
+            return this.topic.channelId
         },
         date() {
-            return initDate(this.data.comment && this.data.comment.date)
+            return initDate(this.comment.date)
         },
+        attachment() {
+            return this.comment.attachment
+        },
+        likeCount() {
+            return this.comment.likeCount
+        },
+        // 回复相关信息
+        parentComment() {
+            return this.comment.parents?.[0]
+        },
+        showInnerReply() {
+            return !this.isMyComment || (this.isMyComment && this.innerReplyContent)
+        },
+        innerReplyContent() {
+            if (this.isMyComment) return ''
+            
+            const userName = this.nickname
+            const parentContent = this.parentComment?.richContent || ''
+            
+            if (!this.parentComment) {
+                return `${userName} : 该条评论已删除!`
+            }
+            
+            return this.parentComment.displayStatus 
+                ? `${userName} : ${parentContent}` 
+                : `${userName} : 该条评论已删除!`
+        },
+        replyImg() {
+            return this.parentComment?.attachment
+        },
+        // 状态和操作相关
         commentStatus() {
-            return this.data.comment && this.data.comment.commentStatus
+            return this.comment.commentStatus
         },
         statusInfo() {
-            const info = {
+            const statusMap = {
                 0: '审核中',
                 2: '未通过',
                 23: '未通过',
             }
-            return info[this.commentStatus]
+            return statusMap[this.commentStatus]
         },
         showLikeIcon() {
-            return this.data.comment.isLiked || this.isLike
+            return this.comment.isLiked || this.isLike
         },
-        spmContent(){
-            const commentId = this.data?.comment?.commentId || this.data?.comment?.id
+        spmContent() {
+            const commentId = this.comment.commentId || this.comment.id || ''
             return `||${commentId}|||`
         }
     },
     methods: {
         ...mapActions(['addReplyLike']),
+        // 图片处理
+        cutCommentImg(img) {
+            if (!img) return
+            return setPicSize(img, 300, 300, 'c_fit', 70)
+        },
+        // 操作方法
         clickOrigin() {
             sendSpmAction(acodeConfig.clickCommentOrigin, `type:${this.type}`)
             window.location.href = this.topicLink
         },
-        clickDelete() {
-            this.$store.commit('toggleDeleteConfirm', {
+        async clickDelete() {
+            const deleteCommentInfo = {
+                sourceId: this.sourceId,
+                commentId: this.commentId,
+                index: this.index,
+            }
+            try {
+                await this.$confirm({
+                    title: '确认要删除这条评论吗？',
+                    confirmText: '删除',
+                    cancelText: '取消',
+                })
+            } catch (error) {
+                console.log('取消删除')
+            }
+            try {
+                await this.$store.dispatch('deleteComment', deleteCommentInfo)
+                this.$toast({
+                    text: "删除成功",
+                    status: "success",
+                })
+            } catch (error) {
+                console.log('删除失败', error)
+                this.$toast({
+                    text: "删除失败",
+                    status: "warn",
+                })
+            }
+        },
+        clickLike() {
+            if (this.showLikeIcon) return
+            sendSpmAction(acodeConfig.clickCommentLike, `type:${this.type}`)
+            this.addReplyLike({
                 sourceId: this.sourceId,
                 commentId: this.commentId,
                 index: this.index,
             })
         },
-        clickLike() {
-            if (!this.showLikeIcon) {
-                sendSpmAction(acodeConfig.clickCommentLike, `type:${this.type}`)
-                this.addReplyLike({
-                    sourceId: this.sourceId,
-                    commentId: this.commentId,
-                    index: this.index,
-                })
-            }
-        },
         clickComment() {
             sendSpmAction(acodeConfig.clickCommentReply, `type:${this.type}`)
             this.$store.commit('toggleReply', {
-                username: this.data.user && this.data.user.username,
+                username: this.data.user?.username,
                 scrollY: window.scrollY,
             })
             this.$store.commit('setReplyComment', {
@@ -225,162 +267,186 @@ export default {
                 channel_id: this.channelId,
             })
         },
-        handleImgClick(item, event){
+        handleImgClick(event) {
             this.$store.commit('setShowImgView', true)
-            this.$store.commit('setViewImgUrl', item.comment?.attachment) // 预览显示原图
+            this.$store.commit('setViewImgUrl', this.attachment) // 预览显示原图
+            
             const clickEl = event.target
             const elHeight = clickEl.offsetHeight
             const elWidth = clickEl.offsetWidth
             const top = clickEl?.getBoundingClientRect().top + elHeight / 2
             const left = clickEl?.getBoundingClientRect().left + elWidth / 2
+            
             this.$store.commit('setViewImgOrigin', `${left}px ${top}px`)
-        },
-        cutCommentImg(img){
-            if(!img) return
-            return setPicSize(img, 300, 300, 'c_fit', 70)
-        },
-        getAvatarImg(img){
-            if(!img) return
-            return setPicSize(img, 100, 100)
-        },
-    },
+        }
+    }
 }
 </script>
 
 <style scoped lang="less">
-    @import '../../../styles/mixin.less';
-    .glyph {
-        font-size: 32px; /*px*/
-        padding-right: 12px;
-    }
-    .comment-item-wrapper {
-        padding-top: 24px;
-        line-height: 1.3;
-        .comment-item-title {
-            display: flex;
-            .userHead {
+@import '../../../styles/mixin.less';
+
+.comment-item-wrapper {
+    padding: 16px 16px 0 16px;
+    
+    // 评论标题
+    .comment-item-title {
+        display: flex;
+        
+        .userHead {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            margin-right: 8px;
+        }
+        
+        .item-title {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            .userName {
                 display: inline-block;
-                width: 66px;
-                height: 66px;
-                margin-right: 24px;
-            }
-            .item-title {
-                display: flex;
-                font-size: 28px; /* px */
-                color:#a4a4a4;
+                vertical-align: top;
+                letter-spacing: 0;
                 flex: 1;
-                .userName {
-                    display: inline-block;
-                    vertical-align: top;
-                    letter-spacing:0;
-                    text-align:left;
-                    height: 40px;
-                    line-height: 40px;
-                    flex: 1;
-                }
-                .status-info {
-                    height: 36px;
-                    font-size: 26px;/* px */
-                    font-family: PingFangSC-Regular, PingFang SC;
-                    font-weight: 400;
-                    color: #999999;
-                    line-height: 36px;
-                }
+                font-weight: 500;
+                font-size: 14px;
+                color: var(--color-text-primary);
+                line-height: 20px;
             }
         }
-        .comment-item-content {
-            margin-left: 90px;
-            margin-top: -6px;
-            font-size: 24px; /* px */
-            color: #2b2b2b;
-            word-wrap: break-word;
-            .comment-discuss { 
-                font-size: 17PX;
-                line-height: 25PX;
-                /deep/ .comment-content-text{
-                    display: flex;
-                    align-items: center;
-                    flex-wrap: wrap;
-                    .emoji{
-                        display: inline-flex;
-                        align-items: center;
-                        justify-content: center;
-                        line-height: normal;
-                    }
-                    .comment-at{
-                        color: #143CA8;
-                    }
-                }
-            }
-            .attachment{
-                width: 96PX;
-                height: 96PX;
-                margin-top: 8PX;
-                img{
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                }
-            }
-            .comment-inner-discuss {
-                font-size: 15PX;
-                background: #eeeff1;
-                padding: 10PX 12PX;
-                margin-top: 12PX;
-                p{
-                    word-break: break-all;
-                }
-                .origin {
-                    color: #a4a4a4;
-                    word-break: break-all;
-                    overflow: hidden;
-                }
-            }
-            .comment-item-footer {
-                margin-top: 22px;
-                padding-bottom: 24px;
-                border-bottom: 1px solid #e3e3e3; /* no */
-                color: #a4a4a4;
+    }
+    
+    // 评论内容
+    .comment-item-content {
+        margin-left: 40px;
+        margin-top: 2px;
+        word-wrap: break-word;
+        
+        // 评论文本
+        .comment-discuss {
+            font-weight: 400;
+            font-size: 14px;
+            color: var(--color-text-primary);
+            line-height: 22px;
+            
+            :deep(.comment-content-text) {
                 display: flex;
                 align-items: center;
-                .delete {
-                    display: inline-block;
-                    margin-left: auto;
-                    width: 28px;/*px*/
-                    height: 28px;/*px*/
-                    background: url('../../assets/img/icon_delete_4.png') no-repeat;
-                    background-size: 100% 100%;
-                }
-                .date {
-                    margin-right: 10px;
-                }
-                .like{
-                    margin-right: 24px;
-                    em {
-                        font-size: 26px; /*px*/
-                        margin-top: -1px;
-                    }
-                    .glyph {
-                        font-size: 30px; /*px*/
-                    }
-                    .glyph-like-s {
-                        color: #fa4d51;
-                        animation: heart_like .5s linear;
-                    }
-                }
-                .like, .comment {
-                    display: flex;
+                flex-wrap: wrap;
+                
+                .emoji {
+                    display: inline-flex;
                     align-items: center;
+                    justify-content: center;
+                    line-height: normal;
+                }
+                
+                .comment-at {
+                    color: #143CA8;
                 }
             }
         }
-        &.deleting {
-            animation: item_deleting .5s linear;
-            animation-fill-mode : forwards;
+        
+        // 附件
+        .attachment {
+            width: 96px;
+            height: 96px;
+            margin-top: 8px;
+            
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
         }
-        &.deleted {
-            display: none;
+        
+        // 内部评论
+        .comment-origin {
+            font-size: 15px;
+            background: var(--color-background);
+            padding: 8px 12px;
+            margin-top: 8px;
+            
+            p {
+                word-break: break-all;
+            }
+            
+            .origin {
+                font-weight: 400;
+                font-size: 14px;
+                color: var(--color-text-tertiary);
+                line-height: 22px;
+                word-break: break-all;
+                overflow: hidden;
+                .line-clamp(2);
+            }
+        }
+        
+        // 评论底部
+        .comment-item-footer {
+            margin-top: 12px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #EBEBEB; /* no */
+            font-weight: 400;
+            font-size: 12px;
+            color: var(--color-text-quaternary);
+            line-height: 18px;
+            display: flex;
+            align-items: center;
+            
+            .date {
+                margin-right: 10px;
+            }
+            
+            .delete {
+                display: inline-block;
+                margin-left: auto;
+                width: 14px;
+                height: 14px;
+                background: url('../../../assets/images/icon_delete.png') no-repeat;
+                background-size: 100% 100%;
+            }
+            
+            .like {
+                margin-right: 24px;
+                
+                em {
+                    font-size: 26px; /*px*/
+                    margin-top: -1px;
+                }
+                
+                .glyph {
+                    font-size: 30px; /*px*/
+                }
+                
+                .glyph-like-s {
+                    color: #fa4d51;
+                    animation: heart_like .5s linear;
+                }
+            }
+            
+            .like, .comment {
+                display: flex;
+                align-items: center;
+            }
         }
     }
+    
+    &.deleting {
+        animation: item_deleting .5s linear;
+        animation-fill-mode: forwards;
+    }
+    
+    &.deleted {
+        display: none;
+    }
+}
+
+// 全局图标样式
+.glyph {
+    font-size: 32px; /*px*/
+    padding-right: 12px;
+}
 </style>
 
