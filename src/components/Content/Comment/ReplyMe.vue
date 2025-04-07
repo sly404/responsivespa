@@ -1,8 +1,8 @@
 <template>
     <div class="reply-me">
         <comment-list 
-            v-if="replyList.length" 
-            :comments="replyList"
+            v-if="replyCommentList.length" 
+            :comments="replyCommentList"
             :spmCCode="spmCCode"
             type="replies" 
             :pageNo="pageNo" 
@@ -18,15 +18,23 @@
 
 <script>
 import { getReplyList } from '../../../requests/commentRequest';
+import { mapState } from 'vuex';
+import CommentList from './CommentList.vue';
 
 export default {
     name: 'ReplyMe',
+    components: {
+        CommentList
+    },
     data() {
         return {
-            replyList: [],
             pageNo: 1,
             finished: false,
+            spmCCode: 'replytome',
         }
+    },
+    computed: {
+        ...mapState(['replyCommentList']),
     },
     methods: {
         async getReplyList() {
@@ -67,6 +75,9 @@ export default {
             this.pageNo++;
             this.getReplyList();
         },
+    },
+    mounted() {
+        this.getReplyList();
     }
 }
 </script>
