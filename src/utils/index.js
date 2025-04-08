@@ -1,1 +1,2 @@
-export { initDate, formatNumber } from './timeFormat'
+export { initDate } from './timeFormat'
+export { formatNumber } from './numberUtil'

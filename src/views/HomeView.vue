@@ -106,6 +106,7 @@ export default {
 .home-view {
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
     min-height: 100vh;
     background-color: var(--color-background);
     color: var(--color-text-primary);
@@ -113,16 +114,29 @@ export default {
     overflow-x: hidden;
     position: relative;
     width: 100%;
+    height: 100vh;
     .home-view-content {
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
+        flex-grow: 1;
+        flex-shrink: 1;
+        flex-basis: auto;
+        overflow: hidden;
     }
 }
 .mobile {
     #userInfo {
         margin-left: 16px;
         margin-right: 16px;
+    }
+    .home-view-content {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 3;
     }
 }
 .tablet {
@@ -134,6 +148,7 @@ export default {
     .navigation {
         width: 134px;
         margin-right: 12px;
+        flex-shrink: 0;
     }
 }
 .desktop {
@@ -147,6 +162,7 @@ export default {
         width: 174px;
         margin-right: 24px;
         padding: 12px 24px !important;
+        flex-shrink: 0;
     }
 }
 

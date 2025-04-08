@@ -42,23 +42,26 @@
             
             <!-- 评论底部 -->
             <div class="comment-item-footer">
-                <span class="date">{{ date }}</span>
-                <!-- 状态信息（仅对自己的评论显示） -->
-                <span v-if="statusInfo" class="status-info">{{statusInfo}}</span>
-                
-                <!-- 操作区：删除、点赞或回复 -->
-                <template v-if="isMyComment">
-                    <span class="delete" @click="clickDelete"></span>
-                </template>
-                <template v-else>
-                    <div class="like" @click="clickLike">
-                        <i :class="['glyph', showLikeIcon ? 'glyph-like-s' : 'glyph-like']"></i>
-                        <em class="like-count" v-if="likeCount">{{ likeCount }}</em>
-                    </div>
-                    <div class="comment" @click="clickComment">
-                        <i class="glyph glyph-comment"></i>
-                    </div>
-                </template>
+                <div class="footer-left">
+                    <span class="date">{{ date }}</span>
+                    <!-- 状态信息（仅对自己的评论显示） -->
+                    <span v-if="statusInfo" class="status-info">{{statusInfo}}</span>
+                </div>
+                <div class="footer-right">
+                    <!-- 操作区：删除、点赞或回复 -->
+                    <template v-if="isMyComment">
+                        <span class="delete" @click="clickDelete"></span>
+                    </template>
+                    <template v-else>
+                        <div class="like" @click="clickLike">
+                            <i :class="['footer-icon', showLikeIcon ? 'like-icon' : 'unlike-icon']"></i>
+                            <span class="like-count" v-if="likeCount">{{ likeCount }}</span>
+                        </div>
+                        <div class="comment" @click="clickComment">
+                            <i class="footer-icon comment-icon"></i>
+                        </div>
+                    </template>
+                </div>
             </div>
         </div>
     </div>
@@ -74,7 +77,7 @@ import 'common-components/lib/commentText/index.css'
 // utils
 import { sendSpmAction, setPicSize } from 'mpfe-utils'
 import { mapActions, mapState } from 'vuex'
-import { initDate } from '../../../utils/index'
+import { formatNumber, initDate } from '../../../utils/index'
 import { acodeConfig } from '../../../config/spmConfig'
 
 export default {
@@ -157,7 +160,7 @@ export default {
             return this.comment.attachment
         },
         likeCount() {
-            return this.comment.likeCount
+            return formatNumber(this.comment.likeCount)
         },
         // 回复相关信息
         parentComment() {
@@ -221,37 +224,44 @@ export default {
                 commentId: this.commentId,
                 index: this.index,
             }
+            this.$confirm({
+                title: '确认要删除这条评论吗？',
+                confirmText: '删除',
+                cancelText: '取消',
+            }).then(async () => {
+                try {
+                    await this.$store.dispatch('deleteComment', deleteCommentInfo)
+                    this.$toast({
+                        text: "删除成功",
+                        status: "success",
+                    })
+                }catch (error) {
+                    console.log('删除失败', error)
+                    this.$toast({
+                        text: "删除失败",
+                        status: "warn",
+                    })
+                }
+            }).catch((error) => {
+                console.log('取消删除', error)
+            })
+        },
+        async clickLike() {
+            if (this.showLikeIcon) return
+            sendSpmAction(acodeConfig.clickCommentLike, `type:${this.type}`)
             try {
-                await this.$confirm({
-                    title: '确认要删除这条评论吗？',
-                    confirmText: '删除',
-                    cancelText: '取消',
+                await this.addReplyLike({
+                    sourceId: this.sourceId,
+                    commentId: this.commentId,
+                    index: this.index,
                 })
             } catch (error) {
-                console.log('取消删除')
-            }
-            try {
-                await this.$store.dispatch('deleteComment', deleteCommentInfo)
+                console.log('点赞失败', error)
                 this.$toast({
-                    text: "删除成功",
-                    status: "success",
-                })
-            } catch (error) {
-                console.log('删除失败', error)
-                this.$toast({
-                    text: "删除失败",
+                    text: "点赞失败",
                     status: "warn",
                 })
             }
-        },
-        clickLike() {
-            if (this.showLikeIcon) return
-            sendSpmAction(acodeConfig.clickCommentLike, `type:${this.type}`)
-            this.addReplyLike({
-                sourceId: this.sourceId,
-                commentId: this.commentId,
-                index: this.index,
-            })
         },
         clickComment() {
             sendSpmAction(acodeConfig.clickCommentReply, `type:${this.type}`)
@@ -394,11 +404,15 @@ export default {
             line-height: 18px;
             display: flex;
             align-items: center;
-            
+            justify-content: space-between;
+            .footer-left, .footer-right {
+                display: flex;
+                align-items: center;
+                flex-wrap: nowrap;
+            }
             .date {
                 margin-right: 10px;
             }
-            
             .delete {
                 display: inline-block;
                 margin-left: auto;
@@ -407,28 +421,40 @@ export default {
                 background: url('../../../assets/images/icon_delete.png') no-repeat;
                 background-size: 100% 100%;
             }
-            
+            .footer-icon{
+                width: 16px;
+                height: 16px;
+                cursor: pointer;
+            }
             .like {
-                margin-right: 24px;
-                
-                em {
-                    font-size: 26px; /*px*/
-                    margin-top: -1px;
+                margin-right: 12px;
+                .like-count{
+                    font-family: PingFangSC, PingFang SC;
+                    font-weight: 400;
+                    font-size: 12px;
+                    color: var(--color-text-tertiary);
+                    line-height: 16px;
                 }
-                
-                .glyph {
-                    font-size: 30px; /*px*/
-                }
-                
-                .glyph-like-s {
-                    color: #fa4d51;
+                .like-icon{
+                    background: url('../../../assets/images/icon_like.png') no-repeat;
+                    background-size: 100% 100%;
                     animation: heart_like .5s linear;
+                    margin-right: 4px;
+                }
+                .unlike-icon{
+                    background: url('../../../assets/images/icon_unlike.png') no-repeat;
+                    background-size: 100% 100%;
+                    margin-right: 4px;
                 }
             }
             
             .like, .comment {
                 display: flex;
                 align-items: center;
+            }
+            .comment-icon {
+                background: url('../../../assets/images/icon_comment.png') no-repeat;
+                background-size: 100% 100%;
             }
         }
     }

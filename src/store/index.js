@@ -66,9 +66,9 @@ export default new Vuex.Store({
             state.myCommentList.splice(index, 1)
             state.commentsSum = state.commentsSum - 1
         },
-        ADD_REPLY_LIKE(state, params) {
-            const { index } = params
-            state.replyCommentList[index].liked = true
+        ADD_REPLY_LIKE(state, index) {
+            if(index < 0 || index === undefined) { return }
+            state.replyCommentList[index].comment.isLiked = true
             state.replyCommentList[index].comment.likeCount++
         },
         TOGGLE_TOAST(state, params) {
@@ -174,15 +174,8 @@ export default new Vuex.Store({
          */
         async addReplyLike({ commit }, params) {
             const { sourceId, commentId, index } = params
-            try {
-                await addLike({ sourceId, commentId })
-                commit("ADD_REPLY_LIKE", index)
-            } catch (error) {
-                commit("TOGGLE_TOAST", {
-                    text: "点赞出错啦！",
-                    status: "warn",
-                })
-            }
+            await addLike({ source_id: sourceId, comment_id: commentId })
+            commit("ADD_REPLY_LIKE", index)
         },
     },
     getters: {

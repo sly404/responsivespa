@@ -70,6 +70,10 @@ const routes = [
                 component: Comment,
                 children: [
                     {
+                        path:'',
+                        redirect:'myComment',
+                    },
+                    {
                         path: 'myComment',
                         name: 'myComment',
                         component: MyComment,

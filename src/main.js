@@ -6,6 +6,7 @@ import ConfirmPlugin from './plugins/confirm'
 import ToastPlugin from './plugins/toast'
 import './styles/style.css'
 import './styles/variables.css'
+import './styles/animation.less'
 
 Vue.use(ConfirmPlugin) // 通过this.$confirm()使用
 Vue.use(ToastPlugin) // 通过this.$toast()使用

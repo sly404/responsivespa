@@ -58,15 +58,15 @@ export default {
                     return;
                 }
                 // data空数组，且不是第一次请求
-                if(res.data.length==0 && this.currentPageNo > 1) {
+                if(res.data.length==0 && this.pageNo > 1) {
                     this.finished = true;
-                    this.currentPageNo--;
+                    this.pageNo--;
                     return;
                 }
                 // data不足当前页size说明获取完了
-                if(res.data.length < this.pageSize){
-                        this.finished = true;
-                    }
+                if(res.data.length < this.pageSize / 2){
+                    this.finished = true;
+                }
                 res.data.forEach((data, i) => {
                     data.comment = Object.assign({},data,{
                         id: data.commentId,

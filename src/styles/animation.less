@@ -1,0 +1,65 @@
+/** 
+    所有的动画逻辑
+*/
+/* 点赞爱心动画 */
+@keyframes heart_like {
+    0% {
+        transform: scale(1);
+    }
+    25% {
+        transform: scale(1.4);
+    }
+    50% {
+        transform: scale(1);
+    }
+    75% {
+        transform: scale(0.6);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+/* 评论删除动画 */
+@keyframes item_deleting{
+    0%{
+        opacity:1;
+    }
+    100%{
+        opacity: 0;
+    }
+}
+
+/* toast消失动画 */
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+/* 删除浮层进、出动画 */
+@keyframes slideOutDown {
+    from {
+        transform: translate3d(0, 0, 0);
+    }
+
+    to {
+        visibility: hidden;
+        transform: translate3d(0, 100%, 0);
+    }
+}
+@keyframes slideInUp {
+    from {
+        transform: translate3d(0, 100%, 0);
+        visibility: visible;
+    }
+
+    to {
+        transform: translate3d(0, 0, 0);
+    }
+}

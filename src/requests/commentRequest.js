@@ -25,6 +25,7 @@ export const getReplyList = async (params) => {
     const defaultParams = {
         pageNo: 1,
         pageSize: 15,
+        topicTypeId: '-2,-21'  // 21:话题 
     }
     try {
         const res = await ucenterApi.get(uri,{ params: { ...defaultParams, ...params } })
@@ -41,16 +42,17 @@ export const getReplyList = async (params) => {
  */
 export const addLike = async (params) => {
     const uri = '/comment/api/like'
-    try {
-        const { data } = await ucenterApi.post(uri, params, {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-        })
-        return data?.data
-    } catch (error) {
-        throw error
+    const res = await ucenterApi.post(uri, params, {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+    })
+    const data = res?.data
+    const code = res?.code
+    if(code !== 200) {
+        throw new Error(res?.msg || '点赞失败')
     }
+    return data
 }
 
 /**

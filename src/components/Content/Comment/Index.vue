@@ -2,7 +2,9 @@
     <div class="comment">
         <MobileHeader v-if="isMobile" title="评论"></MobileHeader>
         <SwitchTab :tabs="tabs" @switchTab="handleSwitchTab"></SwitchTab>
-        <router-view></router-view>
+        <keep-alive>
+            <router-view></router-view>
+        </keep-alive>
     </div>
 </template>
 

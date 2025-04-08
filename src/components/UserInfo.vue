@@ -36,6 +36,9 @@ export default {
     background-color: var(--color-background);
     margin-top: 12px;
     margin-bottom: 16px;
+    flex-basis: auto;
+    flex-shrink: 0;
+    flex-grow: 0;
     .user-avatar {
         box-sizing: border-box;
         border-radius: 50%;

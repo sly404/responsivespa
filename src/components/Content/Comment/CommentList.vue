@@ -61,28 +61,10 @@ export default {
             return this.isFinished
         },
     },
-    methods: {
-        bindScroll(eight) {
-            const load_bar_height =
-                document.querySelector('.comment-list-wrapper-loading').clientHeight + 96
-            const scrollTop = window.scrollY
-
-            if (scrollTop >= document.body.scrollHeight - window.innerHeight - load_bar_height) {
-                this.loadMore()
-            }
-        },
-        loadMore() {
-            this.getMore()
-        },
-    },
     mounted() {
-        window.addEventListener('scroll', this.bindScroll)
         this.$nextTick(() => {
             domDidChange(this.spmCCode)
         })
-    },
-    unmounted() {
-        window.removeEventListener('scroll', this.bindScroll)
     },
 }
 </script>

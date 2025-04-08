@@ -101,50 +101,41 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .router-view-container {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
+    .content-container {
+        width: 100%;
+        height: 100%;
+        .mobile-active {
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 100;
+            background-color: var(--color-white);
+            width: 100vw; /* 使用视口宽度单位 */
+            overflow-x: hidden;
+        }
+    }
 
-.content-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
+    .router-view-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow-x: hidden;
+    }
 
-.content-container.mobile-active {
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 100;
-    background-color: var(--color-white);
-    width: 100vw; /* 使用视口宽度单位 */
-    overflow-x: hidden;
-}
-
-.router-view-wrapper {
-    position: relative;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    overflow-x: hidden;
-}
-
-/* 路由视图容器，确保动画正确 */
-.router-view-wrapper .transition-wrapper {
-    position: relative;
-    width: 100%;
-    flex: 1;
-    display: flex;
+    /* 路由视图容器，确保动画正确 */
+    .router-view-wrapper .transition-wrapper {
+        position: relative;
+        width: 100%;
+        flex: 1;
+        display: flex;
+    }
 }
 
 /* 过渡动画 */
