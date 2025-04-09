@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { uisHost } from '@/config/urlConfig'
+import { uisHost } from '../config/urlConfig'
 import { getEnvironmentByURL } from 'mpfe-utils'
 
 const environment = getEnvironmentByURL(window.location.href)

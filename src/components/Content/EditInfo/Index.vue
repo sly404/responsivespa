@@ -89,7 +89,7 @@ export default {
                 height: 24px;
                 border-radius: 50%;
                 background-color: #111111;
-                background-image: url('@/assets/images/icon_avatar_select.png');
+                background-image: url('../../../assets/images/icon_avatar_select.png');
                 background-repeat: no-repeat;
                 background-position: center;
                 background-size: 12px 12px;

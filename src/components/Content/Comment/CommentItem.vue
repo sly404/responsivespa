@@ -15,23 +15,26 @@
                     {{ isMyComment ? nickname : userNameWithReply }}
                 </span>
             </div>
+            <div class="item-right">
+                <span v-if="isShowDelete" class="delete" @click="clickDelete"></span>
+                <span v-if="isShowReport" class="report" @click="clickReport">举报</span>
+            </div>
         </div>
-        
         <!-- 评论内容区 -->
         <div class="comment-item-content">
+            <!-- 评论时间 -->
+            <div class="date">{{ date }}</div>
             <!-- 评论文本 -->
             <div class="comment-discuss">
                 <CommentText :text="commentContent"></CommentText>
             </div>
-            
             <!-- 评论附件（图片） -->
             <div 
                 v-if="attachment"
                 class="attachment"
                 @click.stop="handleImgClick($event)">
-                <img :src="cutCommentImg(attachment)">
+                <img :src="cutCommentImg(attachment)" />
             </div>
-            
             <!-- 来源信息内容：被回复的评论内容和评论的原文信息 -->
             <div class="comment-origin">
                 <clamp v-if="showInnerReply" :content="innerReplyContent" :img="replyImg"></clamp>
@@ -39,30 +42,28 @@
                     {{ topicTitle }}
                 </a>
             </div>
-            
             <!-- 评论底部 -->
             <div class="comment-item-footer">
                 <div class="footer-left">
-                    <span class="date">{{ date }}</span>
                     <!-- 状态信息（仅对自己的评论显示） -->
                     <span v-if="statusInfo" class="status-info">{{statusInfo}}</span>
                 </div>
-                <div class="footer-right">
-                    <!-- 操作区：删除、点赞或回复 -->
-                    <template v-if="isMyComment">
-                        <span class="delete" @click="clickDelete"></span>
-                    </template>
-                    <template v-else>
-                        <div class="like" @click="clickLike">
-                            <i :class="['footer-icon', showLikeIcon ? 'like-icon' : 'unlike-icon']"></i>
-                            <span class="like-count" v-if="likeCount">{{ likeCount }}</span>
-                        </div>
-                        <div class="comment" @click="clickComment">
-                            <i class="footer-icon comment-icon"></i>
-                        </div>
-                    </template>
+                <!-- 操作区：删除、点赞或回复 -->
+                <div v-if="isReply" class="footer-right">
+                    <div class="like" @click="clickLike">
+                        <i :class="['footer-icon', showLikeIcon ? 'like-icon' : 'unlike-icon']"></i>
+                        <span class="like-count" v-if="likeCount">{{ likeCount }}</span>
+                    </div>
+                    <div class="comment" @click="clickReply">
+                        <i class="footer-icon comment-icon"></i>
+                    </div>
                 </div>
             </div>
+        </div>
+
+        <!-- 评论回复区 -->
+        <div class="comment-item-reply">
+            <DesktopInput v-if="showDesktopInput"></DesktopInput>
         </div>
     </div>
 </template>
@@ -75,10 +76,14 @@ import CommentText from 'common-components/lib/commentText/index'
 import 'common-components/lib/commentText/index.css'
 
 // utils
-import { sendSpmAction, setPicSize } from 'mpfe-utils'
-import { mapActions, mapState } from 'vuex'
+import { event, sendSpmAction, setPicSize } from 'mpfe-utils'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import { formatNumber, initDate } from '../../../utils/index'
 import { acodeConfig } from '../../../config/spmConfig'
+import { eventNameMap } from '../../../config/eventConfig'
+
+// async components
+const DesktopInput = () => import('./DesktopInput.vue')
 
 export default {
     name: 'CommentItem',
@@ -86,6 +91,7 @@ export default {
         avatar: Avatar,
         clamp: Clamp,
         CommentText,
+        DesktopInput,
     },
     props: {
         type: {
@@ -104,15 +110,28 @@ export default {
     
     data() {
         return {
-            isLike: false
+            isLike: false,
+            showInput: false, // 控制是否显示评论输入框
         }
     },
-    
     computed: {
         ...mapState(['nickname', 'avatar']),
+        ...mapGetters(['isDesktop']),
+        showDesktopInput() {
+            return this.isDesktop && this.showInput
+        },
         // 基础数据计算属性
         isMyComment() {
             return this.type === 'comment'
+        },
+        isReply() {
+            return this.type === 'reply'
+        },
+        isShowDelete(){
+            return this.isMyComment && this.isMobile
+        },
+        isShowReport(){
+            return !this.isMyComment && !this.isMobile
         },
         comment() {
             return this.data.comment || {}
@@ -171,7 +190,6 @@ export default {
         },
         innerReplyContent() {
             if (this.isMyComment) return ''
-            
             const userName = this.nickname
             const parentContent = this.parentComment?.richContent || ''
             
@@ -246,6 +264,14 @@ export default {
                 console.log('取消删除', error)
             })
         },
+        async clickReport(){
+            sendSpmAction(acodeConfig.clickCommentReport)
+            this.$store.commit('toggleCommentReport', {
+                isShow: true,
+                commentId: this.commentId,
+                sourceId: this.sourceId,
+            })
+        },
         async clickLike() {
             if (this.showLikeIcon) return
             sendSpmAction(acodeConfig.clickCommentLike, `type:${this.type}`)
@@ -263,19 +289,24 @@ export default {
                 })
             }
         },
-        clickComment() {
+        clickReply() {
             sendSpmAction(acodeConfig.clickCommentReply, `type:${this.type}`)
             this.$store.commit('toggleReply', {
-                username: this.data.user?.username,
                 scrollY: window.scrollY,
             })
             this.$store.commit('setReplyComment', {
+                user_name: this.data.user?.username,
                 topic_title: this.topicTitle,
                 source_id: this.sourceId,
                 topic_url: this.topicLink,
                 reply_id: this.commentId,
                 channel_id: this.channelId,
             })
+            if(this.isDesktop){
+                this.showInput = true
+            }else{
+                event.emit(eventNameMap.showCommentPop)
+            }
         },
         handleImgClick(event) {
             this.$store.commit('setShowImgView', true)
@@ -288,7 +319,7 @@ export default {
             const left = clickEl?.getBoundingClientRect().left + elWidth / 2
             
             this.$store.commit('setViewImgOrigin', `${left}px ${top}px`)
-        }
+        },
     }
 }
 </script>
@@ -302,14 +333,12 @@ export default {
     // 评论标题
     .comment-item-title {
         display: flex;
-        
         .userHead {
             display: inline-block;
             width: 32px;
             height: 32px;
             margin-right: 8px;
         }
-        
         .item-title {
             flex: 1;
             display: inline-flex;
@@ -325,6 +354,20 @@ export default {
                 line-height: 20px;
             }
         }
+        .delete {
+            display: inline-block;
+            margin-left: auto;
+            width: 14px;
+            height: 14px;
+            background: url('../../../assets/images/icon_delete.png') no-repeat;
+            background-size: 100% 100%;
+        }
+        .report{
+            font-weight: 400;
+            font-size: 12px;
+            color: var(--color-text-quaternary);
+            line-height: 18px;
+        }
     }
     
     // 评论内容
@@ -332,7 +375,12 @@ export default {
         margin-left: 40px;
         margin-top: 2px;
         word-wrap: break-word;
-        
+        .date{
+            font-weight: 400;
+            font-size: 12px;
+            color: var(--color-text-quaternary);
+            line-height: 18px;
+        }
         // 评论文本
         .comment-discuss {
             font-weight: 400;
@@ -409,17 +457,6 @@ export default {
                 display: flex;
                 align-items: center;
                 flex-wrap: nowrap;
-            }
-            .date {
-                margin-right: 10px;
-            }
-            .delete {
-                display: inline-block;
-                margin-left: auto;
-                width: 14px;
-                height: 14px;
-                background: url('../../../assets/images/icon_delete.png') no-repeat;
-                background-size: 100% 100%;
             }
             .footer-icon{
                 width: 16px;

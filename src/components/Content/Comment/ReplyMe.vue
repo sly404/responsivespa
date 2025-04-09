@@ -7,7 +7,7 @@
             v-if="replyCommentList.length" 
             :comments="replyCommentList"
             :spmCCode="spmCCode"
-            type="replies" 
+            type="reply" 
             :pageNo="pageNo" 
             :isFinished="finished" 
             :getMore="getMoreReplyList">
@@ -16,19 +16,26 @@
             <img src="../../../assets/images/icon_empty_list.png">
             <div>暂时还没有人回复您哦～</div>
         </div>
+        <MobileInput v-if="showMobileInput"></MobileInput>
+        <Report v-if="showReport"></Report>
     </div>
 </template>
 
 <script>
 import { getReplyList } from '../../../requests/commentRequest';
-import { mapState } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import CommentList from './CommentList.vue';
-import { throttle } from 'mpfe-utils'
+import { throttle, event } from 'mpfe-utils'
+// 异步组件
+const MobileInput = () => import('./MobileInput.vue')
+const Report = () => import('./Report.vue')
 
 export default {
     name: 'ReplyMe',
     components: {
-        CommentList
+        CommentList,
+        MobileInput,
+        Report,
     },
     data() {
         return {
@@ -39,6 +46,13 @@ export default {
     },
     computed: {
         ...mapState(['replyCommentList']),
+        ...mapGetters(['isMobile', 'isTablet']),
+        showMobileInput(){
+            return (this.isMobile || this.isTablet)
+        },
+        showReport(){
+            return this.$store.state.commentReport?.isShow
+        }
     },
     methods: {
         async getReplyList() {
@@ -95,7 +109,7 @@ export default {
                 }, 150)
             }
             this.scrollFunc()
-        }
+        },
     },
     mounted() {
         this.getReplyList();

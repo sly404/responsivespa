@@ -1,4 +1,4 @@
-import ToastComponent from '@/plugins/toast/Toast.vue'
+import ToastComponent from '../../plugins/toast/Toast.vue'
 
 const ToastPlugin = {
   install(Vue) {

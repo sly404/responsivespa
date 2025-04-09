@@ -16,7 +16,8 @@
     "vue": "^2.7.14",
     "vue-router": "^3.6.5",
     "vuex": "^3.6.2",
-    "common-components": "0.3.75-13"
+    "common-components": "0.3.75-16",
+    "mptcfe-spm": "1.0.41"
   },
   "devDependencies": {
     "@vitejs/plugin-vue2": "^2.2.0",

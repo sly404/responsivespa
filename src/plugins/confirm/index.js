@@ -1,4 +1,4 @@
-import ConfirmBoxComponent from '@/plugins/confirm/ConfirmBox.vue'
+import ConfirmBoxComponent from '../../plugins/confirm/ConfirmBox.vue'
 
 const ConfirmPlugin = {
   install(Vue) {

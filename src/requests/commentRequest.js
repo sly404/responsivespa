@@ -12,12 +12,8 @@ export const getMyCommentList = async (params) => {
         pageSize: 15,
         topicTypeId: '-2,-21'  // 21:话题 
     }
-    try {
-        const res = await ucenterApi.get(uri, { params: { ...defaultParams, ...params } })
-        return res
-    } catch (error) {
-        throw error
-    }
+    const res = await ucenterApi.get(uri, { params: { ...defaultParams, ...params } })
+    return res
 }
 
 export const getReplyList = async (params) => {
@@ -27,12 +23,8 @@ export const getReplyList = async (params) => {
         pageSize: 15,
         topicTypeId: '-2,-21'  // 21:话题 
     }
-    try {
-        const res = await ucenterApi.get(uri,{ params: { ...defaultParams, ...params } })
-        return res
-    } catch (error) {
-        throw error
-    }
+    const res = await ucenterApi.get(uri,{ params: { ...defaultParams, ...params } })
+    return res
 }
 
 /**
@@ -62,17 +54,43 @@ export const addLike = async (params) => {
  */
 export const deleteComment = async (params) => {
     const uri = '/comment/api/comments/remove'
-    try {
-        const res = await ucenterApi.post(uri, params, {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-            },
-        })
-        if(res?.code === 200) {
-            return true
-        }
-        return false
-    } catch (error) {
-        throw error
+    const res = await ucenterApi.post(uri, params, {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        },
+    })
+    if(res?.code === 200) {
+        return true
     }
+    return false
+}
+
+/**
+ * @description 发送回复
+ * @param {*} params 
+ * @returns 
+ */
+export const sendReply = async (params) => {
+    const uri = '/comment/api/comments/'
+    const res = await ucenterApi.post(uri, params, {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        },
+    })
+    return res
+}
+
+/**
+ * @description 发送举报
+ * @param {*} params 
+ * @returns 
+ */
+export const sendReport = async (params) => {
+    const uri = '/comment/api/comments/report'
+    const res = await ucenterApi.post(uri, params, {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        },
+    })
+    return res
 }

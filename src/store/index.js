@@ -48,9 +48,12 @@ export default new Vuex.Store({
         },
         currentReply: {
             // 当前回复的信息
-            replyShow: false,
-            username: "",
             scrollY: 0,
+        },
+        commentReport: {
+            isShow: false,
+            commentId: null,
+            sourceId: null,
         },
     },
     mutations: {
@@ -88,16 +91,30 @@ export default new Vuex.Store({
          * @param {number} [params.scrollY] - 滚动位置
          */
         toggleReply(state, params) {
-            state.currentReply.replyShow = !state.currentReply.replyShow
-            if (params && params.username) {
-                state.currentReply.username = params.username
-            }
             if (params && params.scrollY) {
                 state.currentReply.scrollY = params.scrollY
             } else {
                 state.currentReply.scrollY = 0
             }
         },
+        /**
+         * 切换评论举报框的显示状态，并更新相关信息
+         * @param {Object} state - 状态对象
+         * @param {Object} param - 参数对象
+         * @param {boolean} param.isShow - 是否显示举报框
+         * @param {number} param.commentId - 评论的ID
+         * @param {number} param.sourceId - 评论的源ID
+         */
+        toggleCommentReport(state, {isShow, commentId, sourceId}) {
+            state.commentReport.isShow = isShow
+            state.commentReport.commentId = commentId
+            state.commentReport.sourceId = sourceId
+        },
+        /**
+         * 设置我的评论列表
+         * @param {Object} state - 状态对象
+         * @param {Array} list - 我的评论列表
+         */
         setMyCommentList(state, list) {
             state.myCommentList = list
         },
