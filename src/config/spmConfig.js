@@ -4,4 +4,5 @@ export const acodeConfig = {
     clickCommentReply: 11113,
     deleteComment: 10763,
     clickCommentReport: 0,
+    submitComment: 3559, 
 }

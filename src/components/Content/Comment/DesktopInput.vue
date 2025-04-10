@@ -1,24 +1,27 @@
 <template>
-    <div class="replay">
-        <textarea :placeholder="placeholder" rows="1" name="S1" cols="9" onscroll="this.rows++;" v-model="text"/>
-        <div class="emoji-c">
-            <div class="emoji" @click="handleShowEmoji"/>
-            <div class="cmt-brow-wrap" v-if="showEmoji">
-                <div class="cmt-face-box">
-                    <div v-for="item in emojiList" :key="item.id" @click="handleSelectEmoji(item.name)">
-                        <div :class="['cmt-face-item',`cmt-face-${item.id}`]"></div>
+    <div class="desktop-input">
+        <div class="input-container">
+            <textarea :placeholder="placeholder" rows="1" name="S1" cols="9" onscroll="this.rows++;" v-model="text"/>
+            <div class="emoji-c">
+                <div class="emoji" @click="handleShowEmoji"/>
+                <div class="cmt-brow-wrap" v-if="showEmoji">
+                    <div class="cmt-face-box">
+                        <div v-for="item in emojiList" :key="item.id" @click="handleSelectEmoji(item.name)">
+                            <div :class="['cmt-face-item',`cmt-face-${item.id}`]"></div>
+                        </div>
                     </div>
                 </div>
             </div>
+            <div class="reply-btn"><div class="btn" @click="handelSubmit">回复</div></div>
         </div>
-        <div class="reply-btn"><div class="btn" @click="handelSubmit">回复</div></div>
-        <div class="comment-tip" v-show="showSuccess"><i class="icon cmt-suc-icon"></i>回复评论成功</div>
-        <div class="comment-tip" v-show="showFail"><i class="icon cmt-suc-icon cmt-fail-icon"></i>回复评论失败</div>
+        <div class="cancel-btn" @click="handleCancel">取消</div>
     </div>
 </template>
 
 <script>
+import { sendSpmAction } from 'mpfe-utils'
 import  { sendReply }  from '../../../requests/commentRequest'
+import { acodeConfig } from '../../../config/spmConfig'
 
 export default {
     name: 'replayInput',
@@ -27,8 +30,6 @@ export default {
             rowNumber: 1,
             text:'',
             showEmoji: false,
-            showSuccess: false,
-            showFail: false,
             emojiList:[
                 { id:1, name:'流汗' },
                 { id:2, name:'钱' },
@@ -73,7 +74,7 @@ export default {
                 document.querySelector('body').addEventListener('click',this.handleClickBody)
             },200)
         },
-        handelSubmit() {
+        async handelSubmit() {
             if(!this.text)return
             const params = {
                 reply_id: this.replyId,
@@ -85,18 +86,37 @@ export default {
                 source_id: this.sourceId,
                 topic_url: this.topicUrl,
             }
-            sendReply(params).then(()=>{
-                this.showSuccess = true
-                setTimeout(()=>{
-                    this.showSuccess = false
-                    this.$emit('cancelReplay')
-                },2000)
-            }).catch(()=>{
-                this.showFail = true
-                setTimeout(()=>{
-                    this.showFail = false
-                },2000)
-            })
+            const clkParamArr = [
+                'type:reply',
+                `sourceId:${this.sourceId}`,
+                `replyId:${this.replyId}`,
+                `topicTitle:${this.topicTitle}`,
+                `topicUrl:${this.topicUrl}`
+            ]
+            try {
+                const res = await sendReply(params)
+                if(res.code === 200){
+                    this.$toast({
+                        text: '回复成功',
+                        status: 'success',
+                    })
+                    clkParamArr.push(`status:success`)
+                }else{
+                    this.$toast({
+                        text: '回复失败'+res.message,
+                        status:'error',
+                    })
+                    clkParamArr.push(`status:error;code:${res.code};message:${res.msg}`)
+                }
+            } catch (error) {
+                clkParamArr.push(`status:error;message:${error.message}`)
+            } finally {
+                sendSpmAction(acodeConfig.submitComment, clkParamArr.join(';'))
+                this.handleCancel()
+            }
+        },
+        handleCancel(){
+            this.$emit('cancel')
         }
     },
     computed: {
@@ -130,191 +150,180 @@ export default {
 </script>
 
 <style lang="less" scoped>
-    .replay {
+    .desktop-input {
         display: flex;
-        padding: 30px 0 10px 0;
         position:relative;
-        textarea {
+        .input-container{
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
             flex: 1;
-            border: 0;
-            resize:none;
-            border-bottom: 1px #ccc solid;
-            min-height: 20px;
-            color: #888;
-        }
-        textarea:focus {
-            outline: none;
-        }
-        .emoji-c {
-            margin-left: 4px;
-            width: 20px;
-            position: relative;
-            .emoji {
-                width: 20px;
-                height: 20px;
-                background: url('../assets/cmt_brow_icon.png') no-repeat 0 0;
-                position: absolute;
-                bottom: 0;
-                left: 0;
+            min-height: 28px;
+            border: 1px solid rgba(204,204,204,0.7);
+            height: fit-content;
+            textarea {
+                margin-left: 8px;
+                flex: 1;
+                resize:none;
+                min-height: 28px;
+                border: none;
+                font-weight: 400;
+                font-size: 14px;
+                color: #111111;
+                line-height: 28px;
             }
-            .emoji:hover {
-                background-position: 0 -30px;
+            textarea:focus {
+                outline: none;
             }
-            .cmt-brow-wrap{
-                width:402px;
-                height:158px;
-                background:url(../assets/bg03.png) no-repeat 0 0;
-                position:absolute;
-                right:-107px;
-                bottom: -158px;
-                .cmt-face-box{
-                    width:376px;
-                    height:120px;
-                    overflow:hidden;
-                    margin:0 auto;
-                    margin-top:21px;
-                    div{
-                        display: inline-block;
-                        height:40px;
-                        line-height:40px;
-                        width:40px;
-                        margin:0 4px 0 3px;
-                        text-align: center;
-                        cursor:pointer;
-                        &:hover{
-                            background-color:#f5f5f5;
+            .emoji-c {
+                margin-left: auto;
+                margin-right: 12px;
+                width: 22px;
+                height: 22px;
+                position: relative;
+                cursor: pointer;
+                .emoji {
+                    width: 22px;
+                    height: 22px;
+                    background: url('../../../assets/images/icon_emoji@2x.png') no-repeat center;
+                    background-size: contain;
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                }
+                .cmt-brow-wrap{
+                    width:402px;
+                    height:158px;
+                    background:url(../assets/bg03.png) no-repeat 0 0;
+                    position:absolute;
+                    right:-107px;
+                    bottom: -158px;
+                    .cmt-face-box{
+                        width:376px;
+                        height:120px;
+                        overflow:hidden;
+                        margin:0 auto;
+                        margin-top:21px;
+                        div{
+                            display: inline-block;
+                            height:40px;
+                            line-height:40px;
+                            width:40px;
+                            margin:0 4px 0 3px;
+                            text-align: center;
+                            cursor:pointer;
+                            &:hover{
+                                background-color:#f5f5f5;
+                            }
                         }
+                        .cmt-face-item{
+                            width:22px;
+                            height:22px;
+                            display:inline-block;
+                            margin:0 auto -6px;
+                            background-image:url(../assets/cmt-face.png);
+                        }
+                        .cmt-face-1 {
+                            background-position: -2px -2px;
+                        }
+                        .cmt-face-2 {
+                            background-position: -2px -24px;
+                        }
+                        .cmt-face-3 {
+                            background-position: -1px -49px;
+                        }
+                        .cmt-face-4 {
+                            background-position: -2px -73px;
+                        }
+                        .cmt-face-5 {
+                            background-position: -2px -97px;
+                        }
+                        .cmt-face-6 {
+                            background-position: -2px -121px;
+                        }
+                        .cmt-face-7 {
+                            background-position: -2px -145px;
+                        }
+                        .cmt-face-8 {
+                            background-position: -2px -168px;
+                        }
+                        .cmt-face-9 {
+                            background-position: -2px -192px;
+                        }
+                        .cmt-face-10 {
+                            background-position: -2px -215px;
+                        }
+                        .cmt-face-11 {
+                            background-position: -2px -238px;
+                        }
+                        .cmt-face-12 {
+                            background-position: -2px -260px;
+                        }
+                        .cmt-face-13 {
+                            background-position: -2px -284px;
+                        }
+                        .cmt-face-14 {
+                            background-position: -2px -307px;
+                        }
+                        .cmt-face-15 {
+                            background-position: -2px -331px;
+                        }
+                        .cmt-face-16 {
+                            background-position: -2px -355px;
+                        }
+                        .cmt-face-17 {
+                            background-position: -2px -378px;
+                        }
+                        .cmt-face-18 {
+                            background-position: -2px -401px;
+                        }
+                        .cmt-face-19 {
+                            background-position: -2px -425px;
+                        }
+                        .cmt-face-20 {
+                            background-position: -2px -445px;
+                        }
+                        .cmt-face-21 {
+                            background-position: -2px -465px;
+                        }
+                        .cmt-face-22 {
+                            background-position: -2px -488px;
+                        }
+                        .cmt-face-23 {
+                            background-position: -2px -511px;
+                        }
+                        .cmt-face-24 {
+                            background-position: -2px -535px;
+                        }
+                        
                     }
-                    .cmt-face-item{
-                        width:22px;
-                        height:22px;
-                        display:inline-block;
-                        margin:0 auto -6px;
-                        background-image:url(../assets/cmt-face.png);
-                    }
-                    .cmt-face-1 {
-                        background-position: -2px -2px;
-                    }
-                    .cmt-face-2 {
-                        background-position: -2px -24px;
-                    }
-                    .cmt-face-3 {
-                        background-position: -1px -49px;
-                    }
-                    .cmt-face-4 {
-                        background-position: -2px -73px;
-                    }
-                    .cmt-face-5 {
-                        background-position: -2px -97px;
-                    }
-                    .cmt-face-6 {
-                        background-position: -2px -121px;
-                    }
-                    .cmt-face-7 {
-                        background-position: -2px -145px;
-                    }
-                    .cmt-face-8 {
-                        background-position: -2px -168px;
-                    }
-                    .cmt-face-9 {
-                        background-position: -2px -192px;
-                    }
-                    .cmt-face-10 {
-                        background-position: -2px -215px;
-                    }
-                    .cmt-face-11 {
-                        background-position: -2px -238px;
-                    }
-                    .cmt-face-12 {
-                        background-position: -2px -260px;
-                    }
-                    .cmt-face-13 {
-                        background-position: -2px -284px;
-                    }
-                    .cmt-face-14 {
-                        background-position: -2px -307px;
-                    }
-                    .cmt-face-15 {
-                        background-position: -2px -331px;
-                    }
-                    .cmt-face-16 {
-                        background-position: -2px -355px;
-                    }
-                    .cmt-face-17 {
-                        background-position: -2px -378px;
-                    }
-                    .cmt-face-18 {
-                        background-position: -2px -401px;
-                    }
-                    .cmt-face-19 {
-                        background-position: -2px -425px;
-                    }
-                    .cmt-face-20 {
-                        background-position: -2px -445px;
-                    }
-                    .cmt-face-21 {
-                        background-position: -2px -465px;
-                    }
-                    .cmt-face-22 {
-                        background-position: -2px -488px;
-                    }
-                    .cmt-face-23 {
-                        background-position: -2px -511px;
-                    }
-                    .cmt-face-24 {
-                        background-position: -2px -535px;
-                    }
-                    
                 }
             }
-        }
-        .reply-btn {
-            margin-left: 10px;
-            width: 86px;
-            position: relative;
-            .btn {
+            .reply-btn {
+                width: 52px;
+                height: 28px;
+                background: #FFD100;
+                border-radius: 2px;
+                position: relative;
                 cursor: pointer;
-                width: 86px;
-                height: 42px;
-                color: #fff;
-                border-radius: 5px;
-                background: #ff4646;
                 text-align: center;
-                line-height: 42px;
+                font-weight: 500;
                 font-size: 14px;
-                position: absolute;
-                bottom: 0;
-                left: 0;
-            }
-            .btn:hover {
-                background: #d81519;
+                color: #111111;
+                line-height: 28px;
             }
         }
-        .comment-tip{
-            width:130px;
-            height:90px;
-            background:#fff;
-            border:1px #eee solid;
-            box-shadow:0 0 10px rgba(0,0,0,.15);
-            position:absolute;
-            left: 0;
-            right: 0;
-            margin: auto;
-            color:#666;
-            font-size:14px;
-            line-height:20px;
-            text-align:center;
-            border-radius:5px;
-            .cmt-suc-icon{
-                width:30px;
-                height:33px;
-                margin:19px auto 5px;
-                display:block;
-                background:url(../assets/cmt_suc_icon.png) no-repeat 0 0;
-            }
-            .cmt-fail-icon{
-                background:url(../assets/cmt_fail_icon.png) no-repeat 0 0;
-            }
+        .cancel-btn{
+            margin-left: 12px;
+            width: 52px;
+            height: 28px;
+            border-radius: 2px;
+            border: 1px solid #CCCCCC;
+            text-align: center;
+            font-weight: 400;
+            font-size: 14px;
+            color: #111111;
+            line-height: 28px;
         }
     }
 </style>

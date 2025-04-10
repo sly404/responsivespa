@@ -25,6 +25,7 @@ export default new Vuex.Store({
         isInRoot: true,
         // 响应式状态
         screenWidth: window.innerWidth,
+        isLogin: false,
         nickname: defaultNickname,
         avatar: defaultAvatar,
         showImgView: false, // 是否显示预览图片
@@ -46,10 +47,6 @@ export default new Vuex.Store({
             reply_id: "",
             channel_id: "",
         },
-        currentReply: {
-            // 当前回复的信息
-            scrollY: 0,
-        },
         commentReport: {
             isShow: false,
             commentId: null,
@@ -57,6 +54,9 @@ export default new Vuex.Store({
         },
     },
     mutations: {
+        SET_LOGIN(state, isLogin) {
+            state.isLogin = isLogin
+        },
         SET_NICKNAME(state, nickname) {
             state.nickname = nickname
         },
@@ -81,20 +81,6 @@ export default new Vuex.Store({
             }
             if (params && params.status) {
                 state.toast.toastStatus = params.status
-            }
-        },
-        /**
-         * 切换回复框的显示状态，并更新相关信息
-         * @param {Object} state - 状态对象
-         * @param {Object} params - 参数对象
-         * @param {string} [params.username] - 回复的用户名
-         * @param {number} [params.scrollY] - 滚动位置
-         */
-        toggleReply(state, params) {
-            if (params && params.scrollY) {
-                state.currentReply.scrollY = params.scrollY
-            } else {
-                state.currentReply.scrollY = 0
             }
         },
         /**
@@ -164,6 +150,7 @@ export default new Vuex.Store({
             const type = this.getters.isMobile ? "mobile" : "pc"
             const userInfo = await getUserInfo(type)
             if (userInfo) {
+                commit("SET_LOGIN", true)
                 commit("SET_NICKNAME", userInfo.nickname)
                 commit("SET_AVATAR", userInfo.avatar)
             }

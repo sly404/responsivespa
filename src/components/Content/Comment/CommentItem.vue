@@ -44,7 +44,7 @@
             </div>
             <!-- 评论底部 -->
             <div class="comment-item-footer">
-                <div class="footer-left">
+                <div v-if="statusInfo" class="footer-left">
                     <!-- 状态信息（仅对自己的评论显示） -->
                     <span v-if="statusInfo" class="status-info">{{statusInfo}}</span>
                 </div>
@@ -59,11 +59,12 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- 评论回复区 -->
-        <div class="comment-item-reply">
-            <DesktopInput v-if="showDesktopInput"></DesktopInput>
+            <!-- 评论回复区 -->
+            <div v-if="showDesktopInput" class="comment-item-reply">
+                <DesktopInput @cancel="handleCancelInput"></DesktopInput>
+            </div>
+            <!-- 评论底划线 -->
+            <div class="comment-underline"></div>
         </div>
     </div>
 </template>
@@ -291,9 +292,6 @@ export default {
         },
         clickReply() {
             sendSpmAction(acodeConfig.clickCommentReply, `type:${this.type}`)
-            this.$store.commit('toggleReply', {
-                scrollY: window.scrollY,
-            })
             this.$store.commit('setReplyComment', {
                 user_name: this.data.user?.username,
                 topic_title: this.topicTitle,
@@ -305,7 +303,9 @@ export default {
             if(this.isDesktop){
                 this.showInput = true
             }else{
-                event.emit(eventNameMap.showCommentPop)
+                event.emit(eventNameMap.showCommentPop, {
+                    commentId: this.commentId,
+                })
             }
         },
         handleImgClick(event) {
@@ -317,9 +317,11 @@ export default {
             const elWidth = clickEl.offsetWidth
             const top = clickEl?.getBoundingClientRect().top + elHeight / 2
             const left = clickEl?.getBoundingClientRect().left + elWidth / 2
-            
             this.$store.commit('setViewImgOrigin', `${left}px ${top}px`)
         },
+        handleCancelInput(){
+            this.showInput = false
+        }
     }
 }
 </script>
@@ -373,13 +375,13 @@ export default {
     // 评论内容
     .comment-item-content {
         margin-left: 40px;
-        margin-top: 2px;
         word-wrap: break-word;
         .date{
             font-weight: 400;
             font-size: 12px;
             color: var(--color-text-quaternary);
             line-height: 18px;
+            margin-bottom: 8px;
         }
         // 评论文本
         .comment-discuss {
@@ -443,9 +445,7 @@ export default {
         
         // 评论底部
         .comment-item-footer {
-            margin-top: 12px;
             padding-bottom: 16px;
-            border-bottom: 1px solid #EBEBEB; /* no */
             font-weight: 400;
             font-size: 12px;
             color: var(--color-text-quaternary);
@@ -457,6 +457,10 @@ export default {
                 display: flex;
                 align-items: center;
                 flex-wrap: nowrap;
+                margin-top: 12px;
+            }
+            .footer-right{
+                margin-left: auto;
             }
             .footer-icon{
                 width: 16px;
@@ -493,6 +497,14 @@ export default {
                 background: url('../../../assets/images/icon_comment.png') no-repeat;
                 background-size: 100% 100%;
             }
+        }
+        .comment-item-reply{
+            margin-bottom: 16px;
+        }
+        .comment-underline{
+            height: 1px;
+            width: 100%;
+            background: #EBEBEB;
         }
     }
     
